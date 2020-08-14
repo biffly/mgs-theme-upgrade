@@ -26,7 +26,7 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
                     'fields'    => [
                         'sizes'         => [
                             'wpml'          => false,
-                            'type'          => 'checkbox',
+                            'type'          => 'checkboxes',
                             'label'         => __('Desactivar', 'mgs-theme-upgrade'),
                             'desc'          => __('Seleccione cuales tamaños de imagenes desea desactivar el procesamiento.', 'mgs-theme-upgrade'),
                             'def'           => '',
