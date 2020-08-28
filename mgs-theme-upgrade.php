@@ -29,4 +29,11 @@ if( is_admin() ){
     include('inc/class-admin.php');
 }
 
-register_activation_hook(__FILE__, ['MGS_Tables', 'activation']);
+register_activation_hook(__FILE__, 'mgs_tu_activation');
+register_deactivation_hook(__FILE__, 'mgs_tu_activation');
+
+function mgs_tu_activation(){
+    delete_option('mgs-tu-default-images-sizes');
+    delete_option('mgs-tu-images-disabled-sizes');
+    delete_option('mgs-tu-images-disabled');
+}
