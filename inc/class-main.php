@@ -23,8 +23,27 @@ if( !class_exists('MGS_Theme_Upgrade') ){
         
         public function add_actions(){
             add_action('init', function(){
+                
+                //detecta si se debe desactivar la opcion de desactivar creacion de ciertos tamaños de imagenes
+                /*if( class_exists('WP_Smush') ){
+                    define('MGS_TU_IMAGES_DESABLED', true);
+                    delete_option('mgs-tu-images-disabled');
+                }else{
+                    define('MGS_TU_IMAGES_DESABLED', false);
+                }*/
+
+                //determina si ya hay algun PLG que permita la carga de SVG
+                if( class_exists('safe_svg') ){
+                    define('MGS_TU_IMAGES_SGV_DISABLED', true);
+                    delete_option('mgs-tu-images-svg');
+                }else{
+                    define('MGS_TU_IMAGES_SGV_DISABLED', false);
+                }
+
+                
+                
                 //remueve imagenes sizes
-                if( get_option('mgs-tu-images-disabled') ){
+                if( get_option('mgs-tu-images-disabled') && get_option('mgs-tu-images-disabled-sizes') ){
                     foreach( get_option('mgs-tu-images-disabled-sizes') as $us ){
                         remove_image_size($us);
                     }

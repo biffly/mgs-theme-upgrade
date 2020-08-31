@@ -21,3 +21,6 @@ node_modules/
 *.log
 *.sql
 *.sqlite
+/inc/assets/css/admin - Copia.css
+/inc/assets/css/admin - Copia.scss
+/inc/class-admin - Copia.php

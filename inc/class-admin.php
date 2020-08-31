@@ -4,6 +4,8 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
 		private static $instance;
         private $settings;
         private $slug;
+        public static $mgs_tu_images_disabled;
+        public static $mgs_tu_images_svg_disabled;
         
         public static function get_instance(){
 			if( null === self::$instance ){
@@ -35,20 +37,52 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
                 $imgs_sizes_arr[$k][1] = $v['disabled'];
             }
             
-            $mgs_tu_images_disabled = false;
-            $mgs_tu_images_disabled_why = __('Se detecto el pluging <code>Smush</code> para desactivar la creación de imagenes hagalo desde sus opciones.', 'mgs-theme-upgrade');
-            if( class_exists('WP_Smush') ){
-                $mgs_tu_images_disabled = true;
-            }
+            
             
             $this->settings = [
+                'imgs'              => [
+                    'label'     => __('Imagenes', 'mgs-theme-upgrade'),
+                    'fields'    => [
+                        'mgs-tu-images-disabled'        => [
+                            'wpml'              => false,
+                            'type'              => 'onoff',
+                            'label'             => __('Desactivar tamaños', 'mgs-theme-upgrade'),
+                            'desc'              => __('Desactiva la creación de algunas imagenes.'),
+                            'def'               => '',
+                            //'disabled'          => MGS_TU_IMAGES_DESABLED,
+                            //'disabled_why'      => __('Se detecto otro plugin que ya realiza esta tarea para desactivar la creación de imagenes hagalo desde sus opciones.', 'mgs-theme-upgrade')
+                            
+                        ],
+                        'mgs-tu-images-disabled-sizes'  => [
+                            'wpml'          => false,
+                            'type'          => 'checkboxes',
+                            'label'         => __('Desactivar', 'mgs-theme-upgrade'),
+                            'desc'          => __('Seleccione cuales tamaños de imagenes desea desactivar el procesamiento.<br>Solo es posible con las imagenes del tema, no se puede desactivar la creacion de thumbs por defecto de Wordpress', 'mgs-theme-upgrade'),
+                            'def'           => '',
+                            'values'        => $imgs_sizes_arr,
+                            'class'         => 'mgs-tu-chk_small',
+                            'dependent'     => 'mgs-tu-images-disabled'
+                        ],
+                        'mgs-tu-images-svg'        => [
+                            'wpml'              => false,
+                            'type'              => 'onoff',
+                            'label'             => 'SVG',
+                            'desc'              => __('Permite la carga de imagenes en formato SVG.'),
+                            'def'               => '',
+                            'disabled'          => MGS_TU_IMAGES_SGV_DISABLED,
+                            'disabled_why'      => __('Se detecto otro pluging que permirmite la carga de imagenes SVG, desactivelo para habilitar esta opción.', 'mgs-theme-upgrade')
+                            
+                        ],
+                    ]
+                ],
+                
                 'css'               => [
                     'label'     => 'CSS',
                     'fields'    => [
                         'mgs-tu-css'                    => [
                             'wpml'              => false,
-                            'type'              => 'checkbox',
-                            'label'             => __('Activar opciones de CSS personalizada', 'mgs-theme-upgrade'),
+                            'type'              => 'onoff',
+                            'label'             => __('CSS personalizada', 'mgs-theme-upgrade'),
                             'desc'              => __('Carga un CSS personalizado que no se vera afectado por las actualizaciones de su tema.'),
                             'def'               => '',
                         ],
@@ -70,12 +104,13 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
                         ]
                     ]
                 ],
+                 
                 'correos'           => [
                     'label'     => __('Correos', 'mgs-theme-upgrade'),
                     'fields'    => [
                         'mgs-tu-correos'                => [
                             'wpml'              => false,
-                            'type'              => 'checkbox',
+                            'type'              => 'onoff',
                             'label'             => __('Activar opciones de correo', 'mgs-theme-upgrade'),
                             'desc'              => __('Agrega opciones especiales a los correos por defecto de wordpress.'),
                             'def'               => '',
@@ -86,6 +121,7 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
                             'label'             => __('Nombre', 'mgs-theme-upgrade'),
                             'desc'              => __('Nombre asignado a la dirección desde donde se envian los correos', 'mgs-theme-upgrade'),
                             'def'               => get_bloginfo('name'),
+                            'labeled'           => '',
                             'dependent'         => 'mgs-tu-correos'
                         ],
                         'mgs-tu-correos-sender-dir'     => [
@@ -98,75 +134,76 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
                         ]
                     ]
                 ],
-                'imgs'              => [
-                    'label'     => __('Imagenes', 'mgs-theme-upgrade'),
-                    'fields'    => [
-                        'mgs-tu-images-disabled'        => [
-                            'wpml'              => false,
-                            'type'              => 'checkbox',
-                            'label'             => __('Desactivar tamaños', 'mgs-theme-upgrade'),
-                            'desc'              => __('Desactiva la creación de algunas imagenes.'),
-                            'def'               => '',
-                            'disabled'          => $mgs_tu_images_disabled,
-                            'disabled_why'      => $mgs_tu_images_disabled_why
-                            
-                        ],
-                        'mgs-tu-images-disabled-sizes'  => [
-                            'wpml'          => false,
-                            'type'          => 'checkboxes',
-                            'label'         => __('Desactivar', 'mgs-theme-upgrade'),
-                            'desc'          => __('Seleccione cuales tamaños de imagenes desea desactivar el procesamiento.<br>Solo es posible con las imagenes del tema, no se puede desactivar la creacion de thumbs por defecto de Wordpress', 'mgs-theme-upgrade'),
-                            'def'           => '',
-                            'values'        => $imgs_sizes_arr,
-                            'class'         => 'mgs-tu-chk_small',
-                            'dependent'     => 'mgs-tu-images-disabled'
-                        ]
-                    ]
-                ],
             ];
             return $this->settings;
         }
         
         public function page(){
             ?>
-            <div class="wrap">
-                <h1 class="wp-heading-inline">MGS Theme Upgrade</h1>
-                <form method="post" action="options.php">
-                    <?php settings_fields('mgs_theme_upgrade_options');?>
-                
-                    <div id="tabs" class="mgs-tu-tabs">
-                        <?PHP
-                        $this->build_tabs();
-                        $this->build_contents();
-                        ?>
+            <div class="wrap mgs-tu-warp">
+                <div class="ui fluid container">
+                    <div class="mgs-tu-header">
+                        <h1>MGS Theme Upgrade</h1>
+                        <div class="sub-head">
+                            <a href="https://github.com/biffly/mgs-theme-upgrade" target="_blank" class="ui grey button small"><i class="github icon"></i> GitHub</a>
+                        </div>
                     </div>
-                    <?php submit_button();?>
-                    <script>
-                        jQuery(document).ready(function(){
-                            jQuery('#tabs').tabs();
-                            dependent_check();
-                            
-                            
-                            jQuery('.mgs-tu-dependent-tigger').on('change', function(){
-                                dependent_check();
-                            });
-                            
-                            function dependent_check(){
-                                jQuery('.mgs-tu-row-dependent').each(function(){
-                                    if( jQuery(this).data('dependent')!='' ){
-                                        var dependent = jQuery(this).data('dependent');
-                                        jQuery('#'+dependent).addClass('mgs-tu-dependent-tigger');
-                                        if( !jQuery('#'+dependent).is(':checked') ){
-                                            jQuery(this).fadeOut('fast');
-                                        }else{
-                                            jQuery(this).fadeIn();
-                                        }
-                                    }
-                                });
+                    
+                    <div class="mgs-tu-state">
+                        <div class="mgs-tu-logo">
+                            <div class="logo"></div>
+                            <div class="ver"><?php echo __('Versión:', 'mgs-theme-upgrade').' '.MGS_THEME_UPG_VERSION?></div>
+                        </div>
+                        <div></div>
+                        <div class="git-info">
+                            <?php
+                            $git = $this->get_git();
+                            echo '<p class="version">'.__('Ultima versión', 'mgs-theme-upgrade').' '.$git->tag_name.'</p>';
+                            echo '<p class="fecha">'.__('Fecha', 'mgs-theme-upgrade').' '.date('d/m/Y', strtotime($git->published_at)).'</p>';
+                            if( version_compare(MGS_THEME_UPG_VERSION, $git->tag_name)<0 ){
+                                echo '<p class="update"><a href="wp-admin/plugins.php" class="ui grey button small"><i class="icon sync"></i> '.__('Actualizar', 'mgs-theme-upgrade').'</a></p>';
                             }
-                        });
-                    </script>
-                </form>
+                            echo '<p class="last-check">'.__('Ultima verificación', 'mgs-tu-upgrade').': '.date('d/m/Y H:i:s e', get_option('mgs-tu-last-time-git')).'</p>';
+                            ?>
+                        </div>
+                    </div>
+
+                    <form method="post" action="options.php">
+                        <?php settings_fields('mgs_theme_upgrade_options');?>
+                        
+                        <div id="tabs" class="mgs-tu-tabs">
+                            <?PHP
+                            $this->build_tabs();
+                            $this->build_contents();
+                            ?>
+                        </div>
+                        <script>
+                            jQuery(document).ready(function(){
+                                jQuery('#tabs').tabs();
+                                
+                                dependent_check();
+                                
+                                jQuery('.mgs-tu-dependent-tigger').on('change', function(){
+                                    dependent_check();
+                                });
+
+                                function dependent_check(){
+                                    jQuery('.mgs-tu-row-dependent').each(function(){
+                                        if( jQuery(this).data('dependent')!='' ){
+                                            var dependent = jQuery(this).data('dependent');
+                                            jQuery('#'+dependent).addClass('mgs-tu-dependent-tigger');
+                                            if( !jQuery('#'+dependent).is(':checked') ){
+                                                jQuery(this).fadeOut('fast');
+                                            }else{
+                                                jQuery(this).fadeIn();
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
+                    </form>
+                </div>
             </div>
             <?php
         }
@@ -176,7 +213,7 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
             foreach( $this->get_settings() as $id_seccion=>$attrs ){
                 $out .= '<li><a href="#'.$id_seccion.'">'.$attrs['label'].'</a></li>';
             }
-            $out .= '</ul><div class="clear"></div>';
+            $out .= '</ul>';
             echo $out;
         }
         
@@ -184,16 +221,29 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
             foreach( $this->get_settings() as $id_seccion=>$attrs ){
                 $out .= '
                     <div id="'.$id_seccion.'">
-                        <h2>'.$attrs['label'].'</h2>
+                        <h2 class="title-seccion">'.$attrs['label'].'</h2>
                         <table class="form-table">
                             <tbody>
                                 '.$this->build_fields($attrs['fields']).'
+                                '.$this->save_button().'
                             </tbody>
                         </table>
                     </div>
                 ';
             }
             echo $out;
+        }
+        
+        private function save_button(){
+            $out = '
+                <tr class="save-seccion">
+                    <th scope="row"></th>
+                    <td>
+                        <button class="ui primary blue button right floated"><i class="icon save outline"></i> '.__('Guardar cambios', 'mgs-theme-upgrade').'</button>
+                    </td>
+                </tr>
+            ';
+            return $out;
         }
         
         private function build_fields($attrs){
@@ -206,6 +256,9 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
                             break;
                         case 'checkbox':
                             $out .= $this->_checkbox($id, $ops);
+                            break;
+                        case 'onoff':
+                            $out .= $this->_onoff($id, $ops);
                             break;
                         case 'text':
                             $out .= $this->_text($id, $ops);
@@ -230,11 +283,11 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
                 <tr data-dependent="'.$ops['dependent'].'" class="mgs-tu-row-dependent">
                     <th scope="row">
                         <label>'.$ops['label'].'</label>
+                        <p class="desc">'.$ops['desc'].'</p>
                     </th>
                     <td>
                         <fieldset class="'.$ops['class'].'">
             ';
-            if( $ops['desc'] ) $out .= '<p class="description">'.$ops['desc'].'</p>';
             foreach( $ops['values'] as $valor=>$etiqueta ){
                 $c = '';
                 if( is_array($val) ){
@@ -271,6 +324,7 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
                 <tr data-dependent="'.$ops['dependent'].'" class="mgs-tu-row-dependent">
                     <th scope="row">
                         <label for="'.$name.'">'.$ops['label'].'</label>
+                        <p class="desc">'.$ops['desc'].'</p>
                     </th>
                     <td>
                         <label><input type="checkbox" name="'.$name.'" id="'.$name.'" value="1" '.checked($val, true, false).' '.$disabled.'> '.$ops['desc'].$disabled_why.'</label>
@@ -280,20 +334,67 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
             return $out;
         }
         
+        private function _onoff($id, $ops){
+            $name = $this->get_field_name($id, $ops);
+            $val = $this->get_field_value($id, $ops);
+            if( $ops['disabled'] ){
+                $disabled = 'disabled';
+                $disabled_why = $ops['disabled_why'];
+            }else{
+                $disabled = '';
+                $disabled_why = '';
+            }
+            
+            $out = '
+                <tr data-dependent="'.$ops['dependent'].'" class="mgs-tu-row-dependent">
+                    <th scope="row">
+                        <label for="'.$name.'">'.$ops['label'].'</label>
+                        <p class="desc">'.$ops['desc'].'</p>
+                    </th>
+                    <td>
+                        <div class="ui toggle checkbox">
+                            <input type="checkbox" name="'.$name.'" id="'.$name.'" value="1" '.checked($val, true, false).' '.$disabled.'>
+                            <label> '.__('Activar / Desactivar', 'mgs-theme-upgrade').$disabled_why.'</label>
+                        </div>
+            ';
+            if( $ops['disabled'] ){
+                $out .= '
+                        <div class="disabled-aviso">
+                            <div class="ui icon message negative">
+                                <i class="ban icon"></i>
+                                <div class="content">
+                                    <div class="header">'.__('Opción no disponible', 'mgs-theme-upgrade').'</div>
+                                    <p>'.$disabled_why.'</p>
+                                </div>
+                            </div>
+                        </div>
+                ';
+            }
+            $out .= '
+                    </td>
+                </tr>
+            ';
+            return $out;
+        }
+        
         private function _text($id, $ops){
             $name = $this->get_field_name($id, $ops);
             $val = $this->get_field_value($id, $ops);
+            $labeled = ( $ops['labeled']!='' ) ? 'labeled' : '';
             
             $out = '
                 <tr data-dependent="'.$ops['dependent'].'" class="mgs-tu-row-dependent">
                     <th scope="row">
                         <label for="'.$name.'">'.$ops['label'].$this->Label_WPML($ops).'</label>
+                        <p class="desc">'.$ops['desc'].'</p>
                     </th>
                     <td>
-                        <input type="text" class="regular-text" id="'.$name.'" name="'.$name.'" value="'.$val.'" />
+                        <div class="ui fluid '.$labeled.' input">
             ';
-            if( $ops['desc'] ) $out .= '<p class="description">'.$ops['desc'].'</p>';
+            $out .= ( $ops['labeled']!='' ) ? '<div class="ui label"></div>' : '';
             $out .= '
+                            <input type="text" id="'.$name.'" name="'.$name.'" value="'.$val.'">
+                        </div>
                     </td>
                 </tr>
             ';
@@ -302,12 +403,16 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
         
         private function _test($id, $ops){
             $out = '
-                <tr data-dependent="'.$ops['dependent'].'" class="mgs-tu-row-dependent mgs-tu-row-test '.call_user_func([$this, $ops['func']], 'class').'">
-                    <th scope="row">
-                        <label for="'.$name.'">'.$ops['label'].'</label>
-                    </th>
+                <tr data-dependent="'.$ops['dependent'].'" class="mgs-tu-row-dependent mgs-tu-row-test">
+                    <th scope="row"></th>
                     <td>
-                        '.$ops['desc'].'<p class="mgs-tu-test-aviso">'.call_user_func([$this, $ops['func']], 'ico').'</p>
+                        '.$ops['desc'].'
+                        <div class="ui icon tiny message '.call_user_func([$this, $ops['func']], 'class').'">
+                            <i class="'.call_user_func([$this, $ops['func']], 'ico').' icon"></i>
+                            <div class="content">
+                                <p>'.call_user_func([$this, $ops['func']], 'text').'</p>
+                            </div>
+                        </div>
                     </td>
                 </tr>
             ';
@@ -362,8 +467,15 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
             if( $hook=='settings_page_mgs_theme_upgrade_page' ){
                 wp_enqueue_script('jquery');
                 wp_enqueue_script('jquery-ui-tabs');
+                wp_enqueue_script('semantic-ui-js', MGS_THEME_UPG_PLUGIN_DIR_URL.'inc/assets/js/semantic.min.js');
+                wp_enqueue_style('semantic-ui-css', MGS_THEME_UPG_PLUGIN_DIR_URL.'inc/assets/css/semantic.min.css');
+                wp_enqueue_style('mgs-tu-css', MGS_THEME_UPG_PLUGIN_DIR_URL.'inc/assets/css/admin.css');
                 
-                wp_enqueue_style('mgs-jquery-ui', MGS_THEME_UPG_PLUGIN_DIR_URL.'inc/assets/css/admin.css');
+                
+                
+                //wp_enqueue_script('jquery-ui-tabs');
+                //wp_enqueue_style('mgs-jquery-ui', MGS_THEME_UPG_PLUGIN_DIR_URL.'inc/assets/css/admin.css');
+                
                 //wp_enqueue_style('jquery-ui-tabs', 'https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css');
 
                 /*
@@ -418,15 +530,22 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
             
             if( $return=='ico' ){
                 if( $flag ){
-                    return '<svg version="1.1" focusable="false" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 128 128" enable-background="new 0 0 128 128" xml:space="preserve"><path fill="#00c800" d="M116,32H68L52,16H12C5.373,16,0,21.373,0,28v72c0,6.627,5.373,12,12,12h104c6.627,0,12-5.373,12-12V44 C128,37.373,122.627,32,116,32z"/></svg> '.__('Carpeta encontrada.', 'mgs-tu-upgrade');
+                    return 'folder open outline';
+                    
                 }else{
-                    return '<svg version="1.1" focusable="false" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 128 128" enable-background="new 0 0 128 128" xml:space="preserve"><path fill="#960000" d="M116,32H68L52,16H12C5.373,16,0,21.373,0,28v72c0,6.627,5.373,12,12,12h104c6.627,0,12-5.373,12-12V44 C128,37.373,122.627,32,116,32z"/></svg> '.__('Carpeta no encontrada.', 'mgs-tu-upgrade');
+                    return 'folder open outline';
                 }
             }elseif( $return=='class' ){
                 if( $flag ){
-                    return 'valid';
+                    return 'positive';
                 }else{
-                    return 'not-valid';
+                    return 'negative';
+                }
+            }elseif( $return=='text' ){
+                if( $flag ){
+                    return __('Carpeta encontrada.', 'mgs-tu-upgrade');
+                }else{
+                    return __('Carpeta no encontrada.', 'mgs-tu-upgrade');
                 }
             }else{
                 return $flag;
@@ -442,20 +561,47 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
             
             if( $return=='ico' ){
                 if( $flag ){
-                    return '<svg version="1.1" id="Capa_1" focusable="false" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 128 128" enable-background="new 0 0 128 128" xml:space="preserve"><path fill="#00c800" d="M112,30.485V32H80V0h1.515c1.591,0,3.118,0.632,4.243,1.757l24.484,24.485 C111.367,27.368,112,28.894,112,30.485z M78,40c-3.3,0-6-2.7-6-6V0H22c-3.314,0-6,2.686-6,6v116c0,3.314,2.686,6,6,6h84 c3.314,0,6-2.686,6-6V40H78z M46.801,100.127c-0.51,0.543-1.364,0.57-1.908,0.061l0,0L28.677,84.984	c-0.544-0.51-0.571-1.363-0.062-1.908c0.02-0.021,0.041-0.041,0.062-0.061l16.216-15.203c0.544-0.51,1.398-0.482,1.908,0.061l0,0	l4.895,5.222c0.51,0.544,0.482,1.398-0.062,1.908c-0.01,0.01-0.021,0.019-0.032,0.028L41.413,84l10.19,8.969	c0.56,0.492,0.614,1.346,0.122,1.905c-0.009,0.011-0.019,0.021-0.028,0.031L46.801,100.127z M59.625,112.746l-6.863-1.992	c-0.716-0.209-1.128-0.957-0.92-1.674l15.359-52.906c0.209-0.716,0.957-1.128,1.674-.92l6.863,1.992	c0.715,0.208,1.127,0.957,0.92,1.673v0l-15.36,52.907C61.09,112.541,60.342,112.953,59.625,112.746	C59.626,112.746,59.625,112.746,59.625,112.746z M99.823,84.984l-16.216,15.203c-.545,0.51-1.398,0.482-1.908-0.061l0,0	l-4.896-5.223c-0.511-0.543-0.482-1.397,0.062-1.907c0.01-0.01,0.021-0.02,0.031-0.028L87.088,84l-10.191-8.969	c-0.56-0.492-0.613-1.346-0.121-1.905c0.01-0.011,0.019-0.021,0.028-0.031l4.896-5.222c0.51-0.543,1.363-0.571,1.908-0.061l0,0	l16.217,15.203c0.543,0.51,0.57,1.363,0.061,1.908C99.865,84.944,99.844,84.965,99.823,84.984L99.823,84.984z"/></svg> '.__('Archivo encontrado.', 'mgs-tu-upgrade');
+                    return 'file code outline';
                 }else{
-                    return '<svg version="1.1" id="Capa_1" focusable="false" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="24px" height="24px" viewBox="0 0 128 128" enable-background="new 0 0 128 128" xml:space="preserve"><path fill="#960000" d="M112,30.485V32H80V0h1.515c1.591,0,3.118,0.632,4.243,1.757l24.484,24.485 C111.367,27.368,112,28.894,112,30.485z M78,40c-3.3,0-6-2.7-6-6V0H22c-3.314,0-6,2.686-6,6v116c0,3.314,2.686,6,6,6h84 c3.314,0,6-2.686,6-6V40H78z M46.801,100.127c-0.51,0.543-1.364,0.57-1.908,0.061l0,0L28.677,84.984	c-0.544-0.51-0.571-1.363-0.062-1.908c0.02-0.021,0.041-0.041,0.062-0.061l16.216-15.203c0.544-0.51,1.398-0.482,1.908,0.061l0,0	l4.895,5.222c0.51,0.544,0.482,1.398-0.062,1.908c-0.01,0.01-0.021,0.019-0.032,0.028L41.413,84l10.19,8.969	c0.56,0.492,0.614,1.346,0.122,1.905c-0.009,0.011-0.019,0.021-0.028,0.031L46.801,100.127z M59.625,112.746l-6.863-1.992	c-0.716-0.209-1.128-0.957-0.92-1.674l15.359-52.906c0.209-0.716,0.957-1.128,1.674-.92l6.863,1.992	c0.715,0.208,1.127,0.957,0.92,1.673v0l-15.36,52.907C61.09,112.541,60.342,112.953,59.625,112.746	C59.626,112.746,59.625,112.746,59.625,112.746z M99.823,84.984l-16.216,15.203c-.545,0.51-1.398,0.482-1.908-0.061l0,0	l-4.896-5.223c-0.511-0.543-0.482-1.397,0.062-1.907c0.01-0.01,0.021-0.02,0.031-0.028L87.088,84l-10.191-8.969	c-0.56-0.492-0.613-1.346-0.121-1.905c0.01-0.011,0.019-0.021,0.028-0.031l4.896-5.222c0.51-0.543,1.363-0.571,1.908-0.061l0,0	l16.217,15.203c0.543,0.51,0.57,1.363,0.061,1.908C99.865,84.944,99.844,84.965,99.823,84.984L99.823,84.984z"/></svg> '.__('Archivo no encontrado.', 'mgs-tu-upgrade');
+                    return 'file code outline';
                 }
             }elseif( $return=='class' ){
                 if( $flag ){
-                    return 'valid';
+                    return 'positive';
                 }else{
-                    return 'not-valid';
+                    return 'negative';
+                }
+            }elseif( $return=='text' ){
+                if( $flag ){
+                    return __('Archivo encontrado.', 'mgs-tu-upgrade');
+                }else{
+                    return __('Archivo no encontrado.', 'mgs-tu-upgrade');
                 }
             }else{
                 return $flag;
             }
             
+        }
+        
+        public function get_git(){
+            $time = time();
+            $_last = get_option('mgs-tu-last-time-git');
+            if( $_last ){
+                if( ($time - $_last)>3600 ){
+                    $git = wp_remote_get("https://api.github.com/repos/biffly/mgs-theme-upgrade/releases/latest");
+                    $git = json_decode($git['body']);
+                    update_option('mgs-tu-last-time-git', $time);
+                    update_option('mgs-tu-last-git', $git);
+                }else{
+                    $git = get_option('mgs-tu-last-git');
+                }
+            }else{
+                $git = wp_remote_get("https://api.github.com/repos/biffly/mgs-theme-upgrade/releases/latest");
+                $git = json_decode($git['body']);
+                update_option('mgs-tu-last-time-git', $time);
+                update_option('mgs-tu-last-git', $git);
+            }
+            return $git;
         }
     }
     new MGS_Theme_Upgrade_Admin();
