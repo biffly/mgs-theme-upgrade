@@ -14,11 +14,11 @@ Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayo
 
 
 ## Change Log
-- ###### Version 0.1
-  - Lanzamiento
 - ###### Version 0.2
   - Administración mejorada.
   - Desactivar creación de imagenes mejorado.
+- ###### Version 0.1
+  - Lanzamiento
 
 ## Licencia
 - ![License](https://img.shields.io/badge/license-BSD%202--Clause-blue.svg)
