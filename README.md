@@ -14,7 +14,7 @@ Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayo
 
 
 ## Change Log
-- ###### Version 0.2
+- ###### Version 0.3
   - Mejora a la administración.
   - Agregado de seccion funcionalidades (BETA)
 - ###### Version 0.2
