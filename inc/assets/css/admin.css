@@ -101,18 +101,19 @@ body.settings_page_mgs_theme_upgrade_page {
           border-bottom: solid 1px #ccc; }
           .mgs-tu-warp .mgs-tu-tabs .ui-tabs-panel .form-table tr.save-seccion {
             border-bottom: none; }
-        .mgs-tu-warp .mgs-tu-tabs .ui-tabs-panel .form-table th {
+        .mgs-tu-warp .mgs-tu-tabs .ui-tabs-panel .form-table th, .mgs-tu-warp .mgs-tu-tabs .ui-tabs-panel .form-table td.header-dependant {
           vertical-align: top;
           text-align: left;
           padding: 20px 10px 20px 0;
-          font-weight: 300; }
-          .mgs-tu-warp .mgs-tu-tabs .ui-tabs-panel .form-table th label {
+          font-weight: 300;
+          width: 200px; }
+          .mgs-tu-warp .mgs-tu-tabs .ui-tabs-panel .form-table th label, .mgs-tu-warp .mgs-tu-tabs .ui-tabs-panel .form-table td.header-dependant label {
             font-weight: 600;
             cursor: pointer;
             color: #333;
             font-size: 1.1em;
             letter-spacing: -.25px; }
-          .mgs-tu-warp .mgs-tu-tabs .ui-tabs-panel .form-table th p.desc {
+          .mgs-tu-warp .mgs-tu-tabs .ui-tabs-panel .form-table th p.desc, .mgs-tu-warp .mgs-tu-tabs .ui-tabs-panel .form-table td.header-dependant p.desc {
             font-size: 0.9em; }
         .mgs-tu-warp .mgs-tu-tabs .ui-tabs-panel .form-table td .disabled-aviso {
           margin-left: 30px; }

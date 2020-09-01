@@ -24,14 +24,6 @@ if( !class_exists('MGS_Theme_Upgrade') ){
         public function add_actions(){
             add_action('init', function(){
                 
-                //detecta si se debe desactivar la opcion de desactivar creacion de ciertos tamaños de imagenes
-                /*if( class_exists('WP_Smush') ){
-                    define('MGS_TU_IMAGES_DESABLED', true);
-                    delete_option('mgs-tu-images-disabled');
-                }else{
-                    define('MGS_TU_IMAGES_DESABLED', false);
-                }*/
-
                 //determina si ya hay algun PLG que permita la carga de SVG
                 if( class_exists('safe_svg') ){
                     define('MGS_TU_IMAGES_SGV_DISABLED', true);
@@ -61,6 +53,19 @@ if( !class_exists('MGS_Theme_Upgrade') ){
                 if( get_option('mgs-tu-css') && !is_admin() && file_exists(get_stylesheet_directory().'/mgs-tu/main.css') ){
                     wp_enqueue_style('mgs-tu-style', get_stylesheet_directory_uri().'/mgs-tu/main.css');
                 }
+                if( get_option('mgs-tu-readmore') && !is_admin() ){
+                    wp_enqueue_script('jquery');
+                    wp_register_script('mgs-tu-js', MGS_THEME_UPG_PLUGIN_DIR_URL.'inc/assets/js/mgs-tu.js', ['jquery']);
+                    $translation_array = [
+                        'mgs_tu_readmore_text'  => get_option('mgs-tu-readmore-text'),
+                        'mgs_tu_readmore_text_speed'  => get_option('mgs-tu-readmore-text-speed'),
+                    ];
+                    wp_localize_script('mgs-tu-js', 'mgs_tu_js_vars', $translation_array);
+                    wp_enqueue_script('mgs-tu-js');
+                    
+                    wp_enqueue_style('mgs-tu-style', MGS_THEME_UPG_PLUGIN_DIR_URL.'inc/assets/css/mgs-tu.css');
+                }
+                
             });
         }
         

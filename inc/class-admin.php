@@ -40,6 +40,35 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
             
             
             $this->settings = [
+                'funcs'             => [
+                    'label'     => __('Funcionalidades', 'mgs-theme-upgrade'),
+                    'fields'    => [
+                        'mgs-tu-readmore'               => [
+                            'wpml'              => false,
+                            'type'              => 'onoff',
+                            'label'             => __('Leer más', 'mgs-theme-upgrade'),
+                            'desc'              => __('Funcionalidad que permite crear un texto con la opcion de <i>Leer más</i> al estilo Facebook.'),
+                            'def'               => '',                            
+                        ],
+                        'mgs-tu-readmore-text'          => [
+                            'wpml'              => true,
+                            'type'              => 'text',
+                            'label'             => __('Texto', 'mgs-theme-upgrade'),
+                            'desc'              => __('Etiqueta de texto que se agregara despues del primer parrafo.'),
+                            'def'               => __('Leer más', 'mgs-theme-upgrade'),
+                            'dependent'         => 'mgs-tu-readmore'
+                        ],
+                        'mgs-tu-readmore-text-speed'          => [
+                            'wpml'              => false,
+                            'type'              => 'text',
+                            'label'             => __('Velocidad', 'mgs-theme-upgrade'),
+                            'desc'              => __('Velocidad con la que aparece el texto.'),
+                            'def'               => 500,
+                            'dependent'         => 'mgs-tu-readmore'
+                        ]
+                    ]
+                ],
+                
                 'imgs'              => [
                     'label'     => __('Imagenes', 'mgs-theme-upgrade'),
                     'fields'    => [
@@ -234,22 +263,16 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
             echo $out;
         }
         
-        private function save_button(){
-            $out = '
-                <tr class="save-seccion">
-                    <th scope="row"></th>
-                    <td>
-                        <button class="ui primary blue button right floated"><i class="icon save outline"></i> '.__('Guardar cambios', 'mgs-theme-upgrade').'</button>
-                    </td>
-                </tr>
-            ';
-            return $out;
-        }
-        
         private function build_fields($attrs){
             $out = '';
             if( $attrs ){
                 foreach( $attrs as $id=>$ops ){
+                    $out .= '
+                        <tr '.$this->dependent($ops).'>
+                            '.$this->build_th($ops).'
+                            '.$this->open_td($ops).'
+                    ';
+                    
                     switch( $ops['type'] ){
                         case 'checkboxes':
                             $out .= $this->_checkboxes($id, $ops);
@@ -270,6 +293,10 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
                             $out .= '';
                             break;
                     }
+                    $out .= '
+                            '.$this->close_td().'
+                        </tr>
+                    ';
                 }
             }
             return $out;
@@ -280,13 +307,7 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
             $val = $this->get_field_value($id, $ops);
             
             $out = '
-                <tr data-dependent="'.$ops['dependent'].'" class="mgs-tu-row-dependent">
-                    <th scope="row">
-                        <label>'.$ops['label'].'</label>
-                        <p class="desc">'.$ops['desc'].'</p>
-                    </th>
-                    <td>
-                        <fieldset class="'.$ops['class'].'">
+                <fieldset class="'.$ops['class'].'">
             ';
             foreach( $ops['values'] as $valor=>$etiqueta ){
                 $c = '';
@@ -300,11 +321,7 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
                             <label><input type="checkbox" name="'.$name.'[]" value="'.$valor.'" '.$c.' '.$disabled.'> '.$etiqueta[0].'</label><br>';
             }
             $out .= '
-                        </fieldset>
-            ';
-            $out .= '
-                    </td>
-                </tr>
+                </fieldset>
             ';
             return $out;
         }
@@ -319,17 +336,8 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
                 $disabled = '';
                 $disabled_why = '';
             }
-            
             $out = '
-                <tr data-dependent="'.$ops['dependent'].'" class="mgs-tu-row-dependent">
-                    <th scope="row">
-                        <label for="'.$name.'">'.$ops['label'].'</label>
-                        <p class="desc">'.$ops['desc'].'</p>
-                    </th>
-                    <td>
-                        <label><input type="checkbox" name="'.$name.'" id="'.$name.'" value="1" '.checked($val, true, false).' '.$disabled.'> '.$ops['desc'].$disabled_why.'</label>
-                    </td>
-                </tr>
+                <label><input type="checkbox" name="'.$name.'" id="'.$name.'" value="1" '.checked($val, true, false).' '.$disabled.'> '.$ops['desc'].$disabled_why.'</label>
             ';
             return $out;
         }
@@ -346,34 +354,24 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
             }
             
             $out = '
-                <tr data-dependent="'.$ops['dependent'].'" class="mgs-tu-row-dependent">
-                    <th scope="row">
-                        <label for="'.$name.'">'.$ops['label'].'</label>
-                        <p class="desc">'.$ops['desc'].'</p>
-                    </th>
-                    <td>
-                        <div class="ui toggle checkbox">
-                            <input type="checkbox" name="'.$name.'" id="'.$name.'" value="1" '.checked($val, true, false).' '.$disabled.'>
-                            <label> '.__('Activar / Desactivar', 'mgs-theme-upgrade').$disabled_why.'</label>
-                        </div>
+                <div class="ui toggle checkbox">
+                    <input type="checkbox" name="'.$name.'" id="'.$name.'" value="1" '.checked($val, true, false).' '.$disabled.'>
+                    <label> '.__('Activar / Desactivar', 'mgs-theme-upgrade').$disabled_why.'</label>
+                </div>
             ';
             if( $ops['disabled'] ){
                 $out .= '
-                        <div class="disabled-aviso">
-                            <div class="ui icon message negative">
-                                <i class="ban icon"></i>
-                                <div class="content">
-                                    <div class="header">'.__('Opción no disponible', 'mgs-theme-upgrade').'</div>
-                                    <p>'.$disabled_why.'</p>
-                                </div>
-                            </div>
+                <div class="disabled-aviso">
+                    <div class="ui icon message negative">
+                        <i class="ban icon"></i>
+                        <div class="content">
+                            <div class="header">'.__('Opción no disponible', 'mgs-theme-upgrade').'</div>
+                            <p>'.$disabled_why.'</p>
                         </div>
+                    </div>
+                </div>
                 ';
             }
-            $out .= '
-                    </td>
-                </tr>
-            ';
             return $out;
         }
         
@@ -383,36 +381,35 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
             $labeled = ( $ops['labeled']!='' ) ? 'labeled' : '';
             
             $out = '
-                <tr data-dependent="'.$ops['dependent'].'" class="mgs-tu-row-dependent">
-                    <th scope="row">
-                        <label for="'.$name.'">'.$ops['label'].$this->Label_WPML($ops).'</label>
-                        <p class="desc">'.$ops['desc'].'</p>
-                    </th>
-                    <td>
-                        <div class="ui fluid '.$labeled.' input">
+                <div class="ui fluid '.$labeled.' input">
             ';
             $out .= ( $ops['labeled']!='' ) ? '<div class="ui label"></div>' : '';
             $out .= '
-                            <input type="text" id="'.$name.'" name="'.$name.'" value="'.$val.'">
-                        </div>
-                    </td>
-                </tr>
+                    <input type="text" id="'.$name.'" name="'.$name.'" value="'.$val.'">
+                </div>
             ';
             return $out;
         }
         
         private function _test($id, $ops){
             $out = '
-                <tr data-dependent="'.$ops['dependent'].'" class="mgs-tu-row-dependent mgs-tu-row-test">
+                '.$ops['desc'].'
+                <div class="ui icon tiny message '.call_user_func([$this, $ops['func']], 'class').'">
+                    <i class="'.call_user_func([$this, $ops['func']], 'ico').' icon"></i>
+                    <div class="content">
+                        <p>'.call_user_func([$this, $ops['func']], 'text').'</p>
+                    </div>
+                </div>
+            ';
+            return $out;
+        }
+        
+        private function save_button(){
+            $out = '
+                <tr class="save-seccion">
                     <th scope="row"></th>
-                    <td>
-                        '.$ops['desc'].'
-                        <div class="ui icon tiny message '.call_user_func([$this, $ops['func']], 'class').'">
-                            <i class="'.call_user_func([$this, $ops['func']], 'ico').' icon"></i>
-                            <div class="content">
-                                <p>'.call_user_func([$this, $ops['func']], 'text').'</p>
-                            </div>
-                        </div>
+                    <td colspan="2">
+                        <button class="ui primary blue button right floated"><i class="icon save outline"></i> '.__('Guardar cambios', 'mgs-theme-upgrade').'</button>
                     </td>
                 </tr>
             ';
@@ -603,6 +600,47 @@ if( !class_exists('MGS_Theme_Upgrade_Admin') ){
             }
             return $git;
         }
+        
+        private function dependent($ops, $class=''){
+            return ( $ops['dependent']!='' ) ? 'data-dependent="'.$ops['dependent'].'" class="mgs-tu-row-dependent '.$class.'"' : '';
+        }
+        
+        private function is_dependent($ops, $class=''){
+            return ( $ops['dependent']!='' ) ? true : false;
+        }
+        
+        private function build_th($ops){
+            if( $this->is_dependent($ops) ){
+                return '<th scope="row"></th>';
+            }else{
+                return '<th scope="row">'.$this->label($ops).'</th>';
+                
+            }
+        }
+        
+        private function open_td($ops){
+            if( $this->is_dependent($ops) ){
+                return '
+                    <td class="header-dependant">'.$this->label($ops).'</td>
+                    <td>
+                ';
+            }else{
+                return '<td colspan="2">';
+            }
+        }
+        
+        private function close_td(){
+            return '</td>';
+        }
+        
+        private function label($ops){
+            $name = $this->get_field_name($id, $ops);
+            return '
+                <label for="'.$name.'">'.$ops['label'].$this->Label_WPML($ops).'</label>
+                <p class="desc">'.$ops['desc'].'</p>
+            ';
+        }
+        
     }
     new MGS_Theme_Upgrade_Admin();
 }
