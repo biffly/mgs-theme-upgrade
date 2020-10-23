@@ -1,20 +1,28 @@
-<!--
-https://dillinger.io/]
-[https://shields.io/]
--->
+=== MGS Theme Upgrade ===
+Tags: Upgrade, theme
+Requires at least: 4.7
+Tested up to: 5.5.1
+Stable tag: 0.4
+Requires PHP: 7.0
+License: BSD 2-Clause License
+License URI: https://github.com/biffly/mgs-theme-upgrade/blob/master/LICENSE
 
-# MGS Theme Upgrade
+Permite agregar funcionalidades nuevas a su tema.
 
-## Description
-Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayoria de los themas premiun no dejan.
-- Desactivar tamaños de imagenes creadas por el tema que no son utilizadas.
+== Description ==
 
 ![GitHub release](https://img.shields.io/github/release/biffly/mgs-theme-upgrade.svg?style=for-the-badge) ![GitHub last commit](https://img.shields.io/github/last-commit/biffly/mgs-theme-upgrade.svg?style=for-the-badge)
 
 ![GitHub top language](https://img.shields.io/github/languages/top/biffly/mgs-theme-upgrade.svg) ![GitHub issues](https://img.shields.io/github/issues-raw/biffly/mgs-theme-upgrade.svg) ![WP ver min](https://img.shields.io/badge/wordpress-4.9-blue.svg?logo=wordpress)  ![WP ver tested](https://img.shields.io/badge/wordpress-5.5%20tested-green.svg?logo=wordpress) ![License](https://img.shields.io/badge/license-BSD%202--Clause-blue.svg)
 
+Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayoria de los themas premiun no dejan.
+- Desactivar tamaños de imagenes creadas por el tema que no son utilizadas.
 
-## Change Log
+== Frequently Asked Questions ==
+
+== Screenshots ==
+
+== Changelog ==
 - ###### Version 0.4
   - Nueva implementación de admin y mejoras de funcionamiento.
 - ###### Version 0.3
@@ -25,8 +33,8 @@ Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayo
   - Desactivar creación de imagenes mejorado.
 - ###### Version 0.1
   - Lanzamiento
-
-## Licencia
+  
+== License ==
 - ![License](https://img.shields.io/badge/license-BSD%202--Clause-blue.svg)
 - https://github.com/biffly/mgs-theme-upgrade/blob/master/LICENSE
 - Copyright 2019 © [Marcelo Scenna](https://www.marceloscenna.com.ar)
