@@ -2,7 +2,7 @@
 Tags: Upgrade, theme
 Requires at least: 4.7
 Tested up to: 5.5.1
-Stable tag: 0.4
+Stable tag: 0.5
 Requires PHP: 7.0
 License: BSD 2-Clause License
 License URI: https://github.com/biffly/mgs-theme-upgrade/blob/master/LICENSE
@@ -17,12 +17,19 @@ Permite agregar funcionalidades nuevas a su tema.
 
 Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayoria de los themas premiun no dejan.
 - Desactivar tamaños de imagenes creadas por el tema que no son utilizadas.
+- Agregar un Leer mas al estilo fabebook.
+- Cargar una hoja de estilos CSS personalizada sin tener que tocar la del theme.
+- Personalizar los correos que envia wordpress.
+- Addons de funcionalidades.
+
 
 == Frequently Asked Questions ==
 
 == Screenshots ==
 
 == Changelog ==
+- ###### Version 0.5
+  - Nueva administración y agregados de AddOns.
 - ###### Version 0.4
   - Nueva implementación de admin y mejoras de funcionamiento.
 - ###### Version 0.3

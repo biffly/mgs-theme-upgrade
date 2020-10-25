@@ -15,6 +15,8 @@ Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayo
 
 
 ## Change Log
+- ###### Version 0.5
+  - Nueva administración y agregados de AddOns
 - ###### Version 0.4
   - Nueva implementación de admin y mejoras de funcionamiento.
 - ###### Version 0.3
