@@ -93,7 +93,7 @@ if( !class_exists('MGS_Theme_Upgrade') ){
             ];
         }
         
-		private function get_field_name($id){
+		public function get_field_name($id){
             if( self::$compatibility['wpml'] && $this->settings[$id]['wpml'] ){
 				$name = $this->plg_name . '_' . $id . '_' . ICL_LANGUAGE_CODE;
             }else{
@@ -102,7 +102,7 @@ if( !class_exists('MGS_Theme_Upgrade') ){
             return $name;
         }
 		
-		private function get_field_value($id=NULL){
+		public function get_field_value($id=NULL){
 			if( $id===NULL ) return false;
             $name = $this->get_field_name($id);
             $val = get_option($name);

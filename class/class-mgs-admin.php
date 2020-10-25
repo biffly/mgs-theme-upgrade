@@ -32,32 +32,44 @@ if( !class_exists('MGS_Admin_Class') ){
             ?>
             <div class="wrap mgs-admin-warp">
                 <div class="ui fluid container">
-                    <div class="mgs-admin-header">
-                        <h1><?php echo $this->admin_option['page_title']?></h1>
-                        <div class="sub-head">
-                            <a href="https://github.com/<?php echo $this->plg_git?>" target="_blank" class="ui grey button small"><i class="github icon"></i> GitHub</a>
-                        </div>
-                    </div>
-					<div class="mgs-admin-state">
-                        <div class="mgs-admin-logo">
-                            <div class="logo"></div>
-                            <div class="ver"><?php echo __('Versión:', 'mgs-admin').' '.$this->plg_ver?></div>
-                        </div>
-                        <div></div>
-                        <div class="git-info">
-                            <?php
-                            $git = $this->get_git();
-                            echo '<p class="version">'.__('Ultima versión', 'mgs-admin').' '.$git->tag_name.'</p>';
-                            echo '<p class="fecha">'.__('Fecha', 'mgs-admin').' '.date('d/m/Y', strtotime($git->published_at)).'</p>';
-                            if( version_compare($this->plg_ver, $git->tag_name)<0 ){
-                                echo '<p class="update"><a href="wp-admin/plugins.php" class="ui grey button small"><i class="icon sync"></i> '.__('Actualizar', 'mgs-admin').'</a></p>';
-                            }
-                            echo '<p class="last-check">'.__('Ultima verificación', 'mgs-admin').': '.date('d/m/Y H:i:s e', get_option('mgs-admin-last-time-git_'.$this->slug)).' <a href="?page='.$this->slug.'&acc=force_git_check" class="mini ui"><i class="icon sync"></i></a></p>';
-                            ?>
-                        </div>
-                    </div>
+					<svg class="svg-hidden">
+  						<clipPath id="my-clip-path" clipPathUnits="objectBoundingBox"><path d="M0,-0.001 l0,0.733 c0,0,0.005,0.261,0.04,0.265 s0.591,0,0.591,0 s0.035,-0.049,0.035,-0.25 s0.031,-0.247,0.036,-0.247 s0.264,-0.002,0.264,-0.002 s0.033,-0.05,0.033,-0.265 s0,-0.234,0,-0.234 H0"></path></clipPath>
+					</svg>
+					<div class="mgs-admin-header">
+						<div class="top">
+							<div class="left">
+								<div class="warper">
+									<div class="mgs-admin-logo">
+										<div class="logo"></div>
+										<div>
+											<h1><?php echo $this->admin_option['page_title']?></h1>
+											<div class="ver"><?php echo __('Versión:', 'mgs-admin').' '.$this->plg_ver?></div>
+										</div>
+									</div>
+									
+								</div>
+							</div>
+                        	<div class="right">
+								<a href="https://github.com/<?php echo $this->plg_git?>" target="_blank" class="ui button mini"><i class="github icon"></i> GitHub</a>
+								<div class="git-info">
+									<?php
+									$git = $this->get_git();
+									echo '<p class="version">'.__('Ultima versión', 'mgs-admin').' '.$git->tag_name.'</p>';
+									echo '<p class="fecha">'.__('Fecha', 'mgs-admin').' '.date('d/m/Y', strtotime($git->published_at)).'</p>';
+									if( version_compare($this->plg_ver, $git->tag_name)<0 ){
+										echo '<p class="update"><a href="wp-admin/plugins.php" class="ui grey button small"><i class="icon sync"></i> '.__('Actualizar', 'mgs-admin').'</a></p>';
+									}
+									echo '<p class="last-check">'.__('Ultima verificación', 'mgs-admin').': '.date('d/m/Y H:i:s e', get_option('mgs-admin-last-time-git_'.$this->slug)).' <a href="?page='.$this->slug.'&acc=force_git_check" class="mini ui"><i class="icon sync"></i></a></p>';
+									?>
+								</div>
+    	                    </div>
+							<div class="clearfix"></div>
+						</div>
+					</div>
+					<div class="clearfix"></div>
+                    
 					
-					<form method="post" action="options.php">
+					<form method="post" action="options.php" class="mgs-form-options">
                         <?php settings_fields($this->plg_name.'_options');?>
                         
                         <div id="tabs" class="mgs-admin-tabs">
@@ -104,10 +116,12 @@ if( !class_exists('MGS_Admin_Class') ){
 		private function build_tabs(){
             $out = '<ul>';
             foreach( $this->settings as $id_seccion=>$attrs ){
+				$style = '';
 				if( $attrs['icon']=='' ) $attrs['icon'] = 'fas fa-info';
-                $out .= '<li><a href="#'.$id_seccion.'"><i class="'.$attrs['icon'].'"></i> '.$attrs['label'].'</a></li>';
+				if( $attrs['color']!='' ) $style = ' style="color:'.$attrs['color'].';border-color:'.$attrs['color'].'"';
+                $out .= '<li><a href="#'.$id_seccion.'" '.$style.'><i class="'.$attrs['icon'].'"></i> '.$attrs['label'].'</a></li>';
             }
-            $out .= '</ul>';
+            $out .= '<div class="clearfix"></div></ul>';
             echo $out;
         }
 		
@@ -116,12 +130,14 @@ if( !class_exists('MGS_Admin_Class') ){
                 $out .= '
                     <div id="'.$id_seccion.'">
                         <h2 class="title-seccion">'.$attrs['label'].'</h2>
-                        <table class="form-table">
-                            <tbody>
-                                '.$this->build_fields($attrs['fields']).'
-                                '.$this->save_button().'
-                            </tbody>
-                        </table>
+						<div class="warp-table">
+							<table class="form-table">
+								<tbody>
+									'.$this->build_fields($attrs['fields']).'
+									'.$this->save_button().'
+								</tbody>
+							</table>
+						</div>
                     </div>
                 ';
             }

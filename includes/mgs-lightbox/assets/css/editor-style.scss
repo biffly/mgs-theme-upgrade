@@ -1,0 +1,28 @@
+/* CSS Document */
+.mceItem{
+	&.wp-mgs_lightbox_addon{
+		width: 150px !important;
+		height: 150px !important;
+		background-color: #D0D0D0;
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+		background-image: url("../js/tinymce/placeholder-img.png");
+		border: solid 1px #BBBBBB;
+		cursor: pointer;
+		position: relative;
+		&:hover{
+			
+			&::after{
+				content: '';
+				width: 50px;
+				height: 50px;
+				display: block;
+				background-color: aqua;
+				position: absolute;
+				left: 50%; top: 50%;
+				transform: translate(-50%, -50%);
+			}
+		}
+	}
+}

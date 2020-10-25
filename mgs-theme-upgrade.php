@@ -153,11 +153,52 @@ $config = [
 			]
 		]
 	],
+	
+	'addons'			=> [
+		'label'     => __('AddOns', 'mgs-theme-upgrade'),
+		'icon'		=> 'fas fa-puzzle-piece',
+		'color'		=> '#FF9100',
+		'fields'	=> [
+			//LIGHTBOX
+			'addon-lightbox'						=> [
+				'wpml'              => false,
+				'type'              => 'onoff',
+				'label'             => __('MGS Lightbox', 'mgs-theme-upgrade'),
+				'desc'              => __('Opción que permite mostrar en un lightbox la meta información de una imagen.', 'mgs-theme-upgrade'),
+				'def'               => '',
+			],
+			'addon-lightbox-moreinfo-enabled'	=> [
+				'wpml'              => false,
+				'type'              => 'onoff',
+				'label'             => __('Más info', 'mgs-theme-upgrade'),
+				'desc'              => __('Funcionalidad que permite agregar un campo HTML a los META de una imagen.', 'mgs-theme-upgrade'),
+				'def'               => '',
+				'more-help'			=> __('Esta opción permite agregar una descripción en <strong>HTML</strong> a las imagenes cuando son subidas o desde la sección de <i>Multimedia</i>.', 'mgs-theme-upgrade'),
+				'dependent'			=> 'addon-lightbox'
+			],
+			
+			//MGS BLOG SHORTCODE
+			'mgs-blog-shortcode'				=> [
+				'wpml'				=> false,
+				'type'              => 'onoff',
+				'label'             => __('MGS Blog <i>Beta</i>', 'mgs-theme-upgrade'),
+				'desc'              => __('Crear listados de entradas o Custom Posts Types personalizadas.', 'mgs-theme-upgrade'),
+				'def'               => '',
+				'more-help'			=> __('Beta: todavia sin implementar.', 'mgs-theme-upgrade'),
+			],
+		]
+	]
 ];
 
-
 require_once('class/class-main.php');
-new MGS_Theme_Upgrade($config);
+$mgs = new MGS_Theme_Upgrade($config);
+
+if( $mgs->get_field_value('addon-lightbox') ){
+	require_once('includes/mgs-lightbox/mgs-lightbox.php');
+	new MGS_LightBox_AddOn($mgs);
+}
+
+
 if( is_admin() ){
     require_once('class/class-mgs-admin.php');
 	require_once('class/class-admin.php');
