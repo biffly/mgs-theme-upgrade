@@ -23,6 +23,10 @@ $padding_seccion: 20px;
 
 body{
     &.settings_page_mgs_theme_upgrade_page{
+		#update-nag, .update-nag{
+			position: absolute;
+			z-index: 10;
+		}
 		#wpwrap{
 			background-color: #ECECEC;
 		}

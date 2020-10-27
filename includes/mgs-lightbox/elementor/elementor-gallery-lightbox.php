@@ -17,6 +17,13 @@ class MGS_Gallery_Ligtbox_Elementor extends \Elementor\Widget_Base {
     }
     
 	protected function _register_controls(){
+		$_img_sizes = mgs_tu_get_all_image_sizes();
+		$img_sizes = [];
+		foreach($_img_sizes as $k=>$v){
+			$img_sizes[$k] = $k;
+		}
+		
+		
 		$this->start_controls_section(
             'content_section',
             [
@@ -68,6 +75,15 @@ class MGS_Gallery_Ligtbox_Elementor extends \Elementor\Widget_Base {
 			]
 		);
 		$this->add_control(
+			'size',
+			[
+				'label' => 'Tamaño thumb',
+				'type' => \Elementor\Controls_Manager::SELECT,
+				'default' => '',
+				'options' => $img_sizes,
+			]
+		);
+		$this->add_control(
 			'layout',
 			[
 				'label' => 'Diseño',
@@ -83,7 +99,18 @@ class MGS_Gallery_Ligtbox_Elementor extends \Elementor\Widget_Base {
 		$this->add_control(
 			'title',
 			[
-				'label' => 'Mostrar titulo',
+				'label' => 'Mostrar titulo en lightbox',
+				'type' => \Elementor\Controls_Manager::SWITCHER,
+				'label_on' => 'Mostrar',
+				'label_off' => 'Ocultar',
+				'return_value' => 'true',
+				'default' => 'true',
+			]
+		);
+		$this->add_control(
+			'title_list',
+			[
+				'label' => 'Mostrar titulo en listado',
 				'type' => \Elementor\Controls_Manager::SWITCHER,
 				'label_on' => 'Mostrar',
 				'label_off' => 'Ocultar',
@@ -126,7 +153,18 @@ class MGS_Gallery_Ligtbox_Elementor extends \Elementor\Widget_Base {
 			$array_images[] = $v['id'];
 		}
 		$array_images_raw = implode(',', $array_images);
-		echo do_shortcode('[mgs_gallery_lightbox_addon img_id="'.$array_images_raw.'" layout="'.$settings['layout'].'" title="'.$settings['title'].'" desc="'.$settings['desc'].'" class="for-elementor '.$settings['class'].'" cols="'.$settings['cols'].' theme-'.$settings['theme'].'" theme="'.$settings['theme'].'" /]');
+		//echo '<pre>'.print_r($settings, true).'</pre>';
+		echo do_shortcode('[mgs_gallery_lightbox_addon 
+			img_id="'.$array_images_raw.'" 
+			layout="'.$settings['layout'].'" 
+			title="'.$settings['title'].'" 
+			title_list="'.$settings['title_list'].'" 
+			desc="'.$settings['desc'].'" 
+			class="for-elementor '.$settings['class'].'" 
+			cols="'.$settings['cols'].'" 
+			theme="'.$settings['theme'].'" 
+			size="'.$settings['size'].'"
+		/]');
     }
     
 	protected function _content_template(){}

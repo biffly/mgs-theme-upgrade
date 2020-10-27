@@ -3,7 +3,7 @@
 Plugin Name: MGS Theme Upgrade
 Plugin URI: https://github.com/biffly/mgs-theme-upgrade/
 Description: Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayoria de los themas premiun no dejan.
-Version: 0.6
+Version: 0.6.1
 Author: Marcelo Scenna
 Author URI: http://www.marceloscenna.com.ar
 Text Domain: mgs-theme-upgrade
@@ -20,7 +20,7 @@ $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
 );
 $myUpdateChecker->getVcsApi()->enableReleaseAssets();
 
-if( !defined('MGS_THEME_UPG_VERSION') )             define('MGS_THEME_UPG_VERSION', '0.6');
+if( !defined('MGS_THEME_UPG_VERSION') )             define('MGS_THEME_UPG_VERSION', '0.6.1');
 if( !defined('MGS_THEME_UPG_BASENAME') )			define('MGS_THEME_UPG_BASENAME', plugin_basename(__FILE__));
 if( !defined('MGS_THEME_UPG_PLUGIN_DIR') ) 			define('MGS_THEME_UPG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 if( !defined('MGS_THEME_UPG_PLUGIN_DIR_URL') )		define('MGS_THEME_UPG_PLUGIN_DIR_URL', plugin_dir_url(__FILE__));
@@ -212,10 +212,10 @@ register_deactivation_hook(__FILE__, 'mgs_tu_activation');
 
 
 function mgs_tu_activation(){
-    delete_option('mgs-tu-default-images-sizes');
-    delete_option('mgs-tu-images-disabled-sizes');
-    delete_option('mgs-tu-images-disabled');
-	delete_option('mgs-tu-readmore');
+    delete_option(MGS_THEME_UPG_NAME.'-mgs-tu-default-images-sizes');
+    delete_option(MGS_THEME_UPG_NAME.'-mgs-tu-images-disabled-sizes');
+    delete_option(MGS_THEME_UPG_NAME.'-mgs-tu-images-disabled');
+	delete_option(MGS_THEME_UPG_NAME.'-mgs-tu-readmore');
 }
 
 function mgs_tu_get_all_image_sizes(){

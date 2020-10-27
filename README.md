@@ -20,6 +20,8 @@ Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayo
 
 
 ## Change Log
+- ###### Version 0.6.1
+  - Galerias lightbox con opciones nuevas, tamaño y mostrar titulo en listados
 - ###### Version 0.6
   - Agregado de Addon Lightbox
   - Fix prioridad de inclución de CSS personalizado

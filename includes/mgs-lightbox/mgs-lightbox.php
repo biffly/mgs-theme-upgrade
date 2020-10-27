@@ -63,7 +63,8 @@ if( !class_exists('MGS_LightBox_AddOn') ){
 			$gallery_id = 'mgs-gallery-lightbox-'.$uniqid;
 			$out = '
 				<div class="mgs-gallery-lightbox">
-					<div id="'.$sc_id.'" class="mgs-gallery-lightbox-warpper columns-'.$attr['cols'].' '.$attr['class'].'">
+					<!--<pre>'.print_r($attr, true).'</pre>-->
+					<div id="'.$sc_id.'" class="mgs-gallery-lightbox-warpper columns-'.$attr['cols'].' '.$attr['class'].' theme-'.$attr['theme'].'">
 			';
 			foreach( $imgs_array as $_id_img ){
 				$title = get_the_title($_id_img);
@@ -73,7 +74,7 @@ if( !class_exists('MGS_LightBox_AddOn') ){
 					$attr['size'], 
 					false, 
 					[
-						'class'	=>'mgs-lightbox-img',
+						'class'	=>'mgs-lightbox-img mgs-lightbox-img-'.$attr['size'],
 						'alt'	=> $title,
 					]
 				);
@@ -94,8 +95,8 @@ if( !class_exists('MGS_LightBox_AddOn') ){
 					';
 				}elseif( $attr['layout']=='image_text' ){
 					$uniqid_single = uniqid();
+					$out .= $this->build_link($gallery_id, $uniqid_single, $title, $img, $attr);
 					$out .= '
-						<a data-fancybox="'.$gallery_id.'" data-src="#mgs-lightbox-'.$uniqid_single.'" href="javascript:;" title="'.$title.'"  class="mgs-gallery-lightbox-item">'.$img.'</a>
 						<div class="mgs-lightbox-warpper theme-'.$attr['theme'].'" id="mgs-lightbox-'.$uniqid_single.'" style="display: none;">
 							<div class="mgs-lightbox-grid">
 								<div class="mgs-lightbox-img">
@@ -103,17 +104,7 @@ if( !class_exists('MGS_LightBox_AddOn') ){
 								</div>
 								<div class="mgs-lightbox-content">
 									<div class="mgs-lightbox-content-warper">
-					';
-					if( $attr['title']=='true' ){
-						$out .= '		<h3 class="mgs-lightbox-content-title">'.$title.'</h3>';
-					}
-					if( $attr['desc']=='plano' ){
-						$out.= '		<span class="mgs-lightbox-content-desc plano">'.$all_img_info['desc'].'</span>';
-					}if( $attr['desc']=='html' ){
-						$out.= '		<span class="mgs-lightbox-content-desc html">'.$all_img_info['desc_html'].'</span>';
-					}
-					$out .= '
-
+										'.$this->build_content($attr, $title, $all_img_info).'
 									</div>
 								</div>
 							</div>
@@ -121,21 +112,12 @@ if( !class_exists('MGS_LightBox_AddOn') ){
 					';
 				}elseif( $attr['layout']=='text' ){
 					$uniqid_single = uniqid();
+					$out .= $this->build_link($gallery_id, $uniqid_single, $title, $img, $attr);
 					$out .= '
-						<a data-fancybox="'.$gallery_id.'" data-src="#mgs-lightbox-'.$uniqid_single.'" href="javascript:;" title="'.$title.'"  class="mgs-gallery-lightbox-item">'.$img.'</a>
 						<div class="mgs-lightbox-warpper" id="mgs-lightbox-'.$uniqid_single.'" style="display: none;">
 							<div class="mgs-lightbox-content">
 								<div class="mgs-lightbox-content-warper">
-					';
-					if( $attr['title']=='true' ){
-						$out .= '	<h3 class="mgs-lightbox-content-title">'.$title.'</h3>';
-					}
-					if( $attr['desc']=='plano' ){
-						$out.= '	<span class="mgs-lightbox-content-desc plano">'.$all_img_info['desc'].'</span>';
-					}if( $attr['desc']=='html' ){
-						$out.= '	<span class="mgs-lightbox-content-desc html">'.$all_img_info['desc_html'].'</span>';
-					}
-					$out .= '
+									'.$this->build_content($attr, $title, $all_img_info).'
 								</div>
 							</div>
 						</div>
@@ -148,6 +130,29 @@ if( !class_exists('MGS_LightBox_AddOn') ){
 				</div>
 			';
 			
+			return $out;
+		}
+		
+		private function build_link($gallery_id, $uniqid_single, $title, $img, $attr){
+			$out = '<a data-fancybox="'.$gallery_id.'" data-src="#mgs-lightbox-'.$uniqid_single.'" href="javascript:;" title="'.$title.'"  class="mgs-gallery-lightbox-item">';
+			$out .= $img;
+			if( $attr['title_list'] ){
+				$out .= '<p class="mgs-gallery-lightbox-caption">'.$title.'</p>';
+			}
+			$out .= '</a>';
+			return $out;
+		}
+		
+		private function build_content($attr, $title, $all_img_info){
+			$out = '';
+			if( $attr['title']=='true' ){
+				$out .= '<h3 class="mgs-lightbox-content-title">'.$title.'</h3>';
+			}
+			if( $attr['desc']=='plano' ){
+				$out.= '<span class="mgs-lightbox-content-desc plano">'.$all_img_info['desc'].'</span>';
+			}if( $attr['desc']=='html' ){
+				$out.= '<span class="mgs-lightbox-content-desc html">'.$all_img_info['desc_html'].'</span>';
+			}
 			return $out;
 		}
 		
