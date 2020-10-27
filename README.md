@@ -20,6 +20,8 @@ Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayo
 
 
 ## Change Log
+- ###### Version 0.6.2
+  - FIX shortcode galeria
 - ###### Version 0.6.1
   - Galerias lightbox con opciones nuevas, tamaño y mostrar titulo en listados
 - ###### Version 0.6

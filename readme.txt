@@ -2,7 +2,7 @@
 Tags: Upgrade, theme
 Requires at least: 4.7
 Tested up to: 5.5.1
-Stable tag: 0.6.1
+Stable tag: 0.6.2
 Requires PHP: 7.0
 License: BSD 2-Clause License
 License URI: https://github.com/biffly/mgs-theme-upgrade/blob/master/LICENSE
@@ -26,6 +26,8 @@ Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayo
 == Screenshots ==
 
 == Changelog ==
+- ###### Version 0.6.2
+  - FIX shortcode galeria
 - ###### Version 0.6.1
   - Galerias lightbox con opciones nuevas, tamaño y mostrar titulo en listados
 - ###### Version 0.6

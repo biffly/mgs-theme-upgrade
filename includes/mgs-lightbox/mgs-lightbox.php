@@ -97,7 +97,7 @@ if( !class_exists('MGS_LightBox_AddOn') ){
 					$uniqid_single = uniqid();
 					$out .= $this->build_link($gallery_id, $uniqid_single, $title, $img, $attr);
 					$out .= '
-						<div class="mgs-lightbox-warpper theme-'.$attr['theme'].'" id="mgs-lightbox-'.$uniqid_single.'" style="display: none;">
+						<div class="mgs-lightbox-warpper '.$attr['class'].' theme-'.$attr['theme'].'" id="mgs-lightbox-'.$uniqid_single.'" style="display: none;">
 							<div class="mgs-lightbox-grid">
 								<div class="mgs-lightbox-img">
 									<div class="mgs-lightbox-img-warpper">'.$img_full.'</div>
@@ -114,7 +114,7 @@ if( !class_exists('MGS_LightBox_AddOn') ){
 					$uniqid_single = uniqid();
 					$out .= $this->build_link($gallery_id, $uniqid_single, $title, $img, $attr);
 					$out .= '
-						<div class="mgs-lightbox-warpper" id="mgs-lightbox-'.$uniqid_single.'" style="display: none;">
+						<div class="mgs-lightbox-warpper '.$attr['class'].' theme-'.$attr['theme'].'" id="mgs-lightbox-'.$uniqid_single.'" style="display: none;">
 							<div class="mgs-lightbox-content">
 								<div class="mgs-lightbox-content-warper">
 									'.$this->build_content($attr, $title, $all_img_info).'
