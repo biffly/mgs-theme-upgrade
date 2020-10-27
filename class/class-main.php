@@ -28,14 +28,14 @@ if( !class_exists('MGS_Theme_Upgrade') ){
 					foreach( $this->get_field_value('mgs-tu-images-disabled-sizes') as $us ){
                         remove_image_size($us);
                     }
-				}, 999);
+				}, 99999);
 			}
 			
 			//cargo css personalizado
 			if( $this->get_field_value('mgs-tu-css') && !is_admin() && file_exists(get_stylesheet_directory().'/mgs-tu/main.css') ){
 				add_action('wp_enqueue_scripts', function(){
 					wp_enqueue_style('mgs-tu-style', get_stylesheet_directory_uri().'/mgs-tu/main.css');
-				});
+				}, 99999);
 			}
 			
 			//READ MORE

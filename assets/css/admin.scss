@@ -144,12 +144,113 @@ body{
 				}
 			}
 		}
+		
+		.mgs-tu-menu{
+			margin-left: 5%;
+			display: inline-block;
+			padding: 15px;
+			background-color: lighten($bg_header, 4%);
+			border-radius: 30px;
+			max-width: 55%;
+			.item{
+				margin: 0;
+				margin-right: 15px;
+				display: inline-block;
+				color: #a7a7a7;
+				font-family: 'Ubuntu', sans-serif;
+				font-size: 16px;
+				font-weight: 300;
+				padding: 10px 15px;
+				border-radius: 30px;
+				border: solid 1px #a7a7a7;
+				cursor: pointer;
+				&:hover{
+					color: #fff;
+					border-color: #fff;
+				}
+				&.active{
+					color: #fff;
+					border-color: #fff;
+				}
+				.aviso-config{
+					color: #e46363;
+				}
+			}
+		}
 	}
 	
 	.mgs-form-options{
 		position: relative;
 	}
 	.mgs-admin-tabs{
+		margin-left: 5%;
+		margin-top: 25px;
+		max-width: 55%;
+		.tab{
+			background-color: #fff;
+			padding: 20px 60px;
+			border-radius: 15px;
+			overflow: hidden;
+			position: relative;
+			@include shadow;
+			&::before{
+				content: '';
+				background: $bg_header;
+				position: absolute;
+				top: 0;
+				bottom: 0;
+				left: 0;
+				width: 8px;
+			}
+			.title-seccion{
+                margin: 0;
+                padding: 0;
+                line-height: 1em;
+                font-size: 22px;
+                font-weight: 600;
+                font-family: 'Ubuntu', sans-serif;
+                color: #000;
+            }
+			.form-table{
+                margin: 0;
+                font-size: 14px;
+                font-family: 'Ubuntu', sans-serif;
+                font-weight: 200;
+                tr{
+                    border-bottom: solid 1px $gris;
+                    &.save-seccion{
+                        border-bottom: none;
+                    }
+                }
+                th, td.header-dependant{
+                    vertical-align: top;
+                    text-align: left;
+                    padding: 20px 10px 20px 0;
+                    font-weight: 300;
+                    width: 200px;
+                    label{
+                        font-weight: 600;
+                        cursor: pointer;
+                        color: #333;
+                        font-size: 1.1em;
+                        letter-spacing: -.25px;
+                    }
+                    p.desc{
+                        font-size: 0.9em;
+                    }
+                }
+                td{
+                    .disabled-aviso{
+                        margin-left: 30px;
+                    }
+					&.header-dependant{
+						width: 300px;
+					}
+                }
+            }
+		}
+		
+		
         .ui-tabs-nav{
             margin: 0;
 			position: absolute;

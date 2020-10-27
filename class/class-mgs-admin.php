@@ -65,6 +65,7 @@ if( !class_exists('MGS_Admin_Class') ){
     	                    </div>
 							<div class="clearfix"></div>
 						</div>
+						<div class="mgs-tu-menu"><?PHP $this->build_tabs_2();?></div>
 					</div>
 					<div class="clearfix"></div>
                     
@@ -74,14 +75,18 @@ if( !class_exists('MGS_Admin_Class') ){
                         
                         <div id="tabs" class="mgs-admin-tabs">
                             <?PHP
-                            $this->build_tabs();
-                            $this->build_contents();
+                            //$this->build_tabs();
+                            $this->build_contents_2();
                             ?>
                         </div>
                         <script>
                             jQuery(document).ready(function(){
                                 //tabs
-								jQuery('#tabs').tabs();
+								//jQuery('#tabs').tabs();
+								jQuery('.tabs .item').tab({
+									history		: true,
+									historyType	: 'hash'
+								});
 								
 								//more help
 								jQuery('.mgs-more-help-tooltip').popup();
@@ -125,10 +130,54 @@ if( !class_exists('MGS_Admin_Class') ){
             echo $out;
         }
 		
+		private function build_tabs_2(){
+            $out = '<div class="tabs">';
+            foreach( $this->settings as $id_seccion=>$attrs ){
+				$style = '';
+				if( $attrs['icon']=='' ) $attrs['icon'] = 'fas fa-info';
+				if( $attrs['color']!='' ){
+					$style = ' style="color:'.$attrs['color'].';border-color:'.$attrs['color'].'"';
+					$out .= '<style>#tab-item-'.$id_seccion.'{color:'.$attrs['color'].';border-color:'.$attrs['color'].';}#tab-item-'.$id_seccion.'.active,#tab-item-'.$id_seccion.':hover{color:#fff;border-color:'.$attrs['color'].';background-color:'.$attrs['color'].';}</style>';
+				}
+				$aviso = '';
+				$pri = array_key_first($this->settings[$id_seccion]['fields']);
+				if( !$this->test_settings($id_seccion) && $this->get_field_value($pri) ){
+					$aviso = '<i class="aviso-config fas fa-exclamation"></i>';
+				}
+				
+				//$out .= '<pre>'.print_r($this->get_field_value($pri), true).'</pre>';
+                $out .= '<div class="item" data-tab="'.$id_seccion.'" id="tab-item-'.$id_seccion.'"><i class="'.$attrs['icon'].'"></i> '.$attrs['label'].' '.$aviso.'</div>';
+            }
+            $out .= '<div class="clearfix"></div></div>';
+            echo $out;
+        }
+		
 		private function build_contents(){
             foreach( $this->settings as $id_seccion=>$attrs ){
                 $out .= '
                     <div id="'.$id_seccion.'">
+                        <h2 class="title-seccion">'.$attrs['label'].'</h2>
+						<div class="warp-table">
+							<table class="form-table">
+								<tbody>
+									'.$this->build_fields($attrs['fields']).'
+									'.$this->save_button().'
+								</tbody>
+							</table>
+						</div>
+                    </div>
+                ';
+            }
+            echo $out;
+        }
+		
+		private function build_contents_2(){
+            foreach( $this->settings as $id_seccion=>$attrs ){
+				if( $attrs['color']!='' ){
+					$out .= '<style>#tab-content-'.$id_seccion.'::before{background-color:'.$attrs['color'].';}</style>';
+				}
+                $out .= '
+                    <div class="ui tab" data-tab="'.$id_seccion.'" id="tab-content-'.$id_seccion.'">
                         <h2 class="title-seccion">'.$attrs['label'].'</h2>
 						<div class="warp-table">
 							<table class="form-table">
@@ -366,9 +415,10 @@ if( !class_exists('MGS_Admin_Class') ){
 		public function enqueue_scripts($hook){
 			if( $hook=='settings_page_'.$this->slug ){
 				wp_enqueue_script('jquery');
-                wp_enqueue_script('jquery-ui-tabs');
+                //wp_enqueue_script('jquery-ui-tabs');
 				wp_enqueue_script('kit-fontawesome', 'https://kit.fontawesome.com/432b91a985.js');
-                wp_enqueue_script('semantic-ui-js', $this->plg_url.'assets/js/semantic.min.js');
+                wp_enqueue_script('semantic-ui-js', $this->plg_url.'assets/js/semantic.min.js', ['jquery']);
+				wp_enqueue_script('jquery-address-js', $this->plg_url.'assets/js/jquery.address.js', ['semantic-ui-js']);
                 wp_enqueue_style('semantic-ui-css', $this->plg_url.'assets/css/semantic.min.css');
                 wp_enqueue_style('mgs-admin-css', $this->plg_url.'assets/css/admin.css');
 			}			
@@ -400,7 +450,6 @@ if( !class_exists('MGS_Admin_Class') ){
         }
 		
 		public function register_settings(){
-			//echo '<pre>'.print_r($this->settings, true).'</pre>';
             foreach( $this->settings as $seccion ){
                 foreach( $seccion['fields'] as $id=>$attrs ){
                     if( self::$compatibility['wpml'] && $attrs['wpml'] ){
@@ -417,6 +466,18 @@ if( !class_exists('MGS_Admin_Class') ){
                     }
                 }
             }
+        }
+		
+		public function test_settings($id_seccion){
+			$r = true;
+            foreach( $this->settings[$id_seccion]['fields'] as $field ){
+                if( $field['func'] ){
+					if( !call_user_func([$this, $field['func']], '') ){
+						$r = false;
+					}
+				}
+            }
+			return $r;
         }
 		
 		public function get_field_name($id, $ops=NULL){

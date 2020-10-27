@@ -8,6 +8,11 @@ https://dillinger.io/]
 ## Description
 Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayoria de los themas premiun no dejan.
 - Desactivar tamaños de imagenes creadas por el tema que no son utilizadas.
+- Agregar un Leer mas al estilo fabebook.
+- Cargar una hoja de estilos CSS personalizada sin tener que tocar la del theme.
+- Personalizar los correos que envia wordpress.
+- Addons de funcionalidades.
+  - **NEW** Addon MGS Lightbox
 
 ![GitHub release](https://img.shields.io/github/release/biffly/mgs-theme-upgrade.svg?style=for-the-badge) ![GitHub last commit](https://img.shields.io/github/last-commit/biffly/mgs-theme-upgrade.svg?style=for-the-badge)
 
@@ -15,6 +20,9 @@ Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayo
 
 
 ## Change Log
+- ###### Version 0.6
+  - Agregado de Addon Lightbox
+  - Fix prioridad de inclución de CSS personalizado
 - ###### Version 0.5
   - Nueva administración y agregados de AddOns
 - ###### Version 0.4

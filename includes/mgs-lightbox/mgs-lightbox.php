@@ -253,7 +253,7 @@ if( !class_exists('MGS_LightBox_AddOn') ){
 				'caption'		=> $attachment->post_excerpt,
 				'desc'			=> $attachment->post_content,
 				'title'			=> $attachment->post_title,
-				'desc_html'		=> get_field('mgs_field_5f6e180c9ffca', $attachment_id)
+				'desc_html'		=> get_field('field_5f6e180c9ffca', $attachment_id)
 			];
 		}
 		
@@ -272,7 +272,7 @@ if( !class_exists('MGS_LightBox_AddOn') ){
 					'title' => 'MGS Media Options',
 					'fields' => [
 						[
-							'key' => 'mgs_field_5f6e180c9ffca',
+							'key' => 'field_5f6e180c9ffca',
 							'label' => 'Descripción',
 							'name' => 'descripcion',
 							'type' => 'wysiwyg',

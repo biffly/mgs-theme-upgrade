@@ -3,7 +3,7 @@
 Plugin Name: MGS Theme Upgrade
 Plugin URI: https://github.com/biffly/mgs-theme-upgrade/
 Description: Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayoria de los themas premiun no dejan.
-Version: 0.5
+Version: 0.6
 Author: Marcelo Scenna
 Author URI: http://www.marceloscenna.com.ar
 Text Domain: mgs-theme-upgrade
@@ -20,7 +20,7 @@ $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
 );
 $myUpdateChecker->getVcsApi()->enableReleaseAssets();
 
-if( !defined('MGS_THEME_UPG_VERSION') )             define('MGS_THEME_UPG_VERSION', '0.5');
+if( !defined('MGS_THEME_UPG_VERSION') )             define('MGS_THEME_UPG_VERSION', '0.6');
 if( !defined('MGS_THEME_UPG_BASENAME') )			define('MGS_THEME_UPG_BASENAME', plugin_basename(__FILE__));
 if( !defined('MGS_THEME_UPG_PLUGIN_DIR') ) 			define('MGS_THEME_UPG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 if( !defined('MGS_THEME_UPG_PLUGIN_DIR_URL') )		define('MGS_THEME_UPG_PLUGIN_DIR_URL', plugin_dir_url(__FILE__));
