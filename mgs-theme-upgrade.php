@@ -3,7 +3,7 @@
 Plugin Name: MGS Theme Upgrade
 Plugin URI: https://github.com/biffly/mgs-theme-upgrade/
 Description: Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayoria de los themas premiun no dejan.
-Version: 0.6.2
+Version: 0.6.3
 Author: Marcelo Scenna
 Author URI: http://www.marceloscenna.com.ar
 Text Domain: mgs-theme-upgrade
@@ -20,7 +20,7 @@ $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
 );
 $myUpdateChecker->getVcsApi()->enableReleaseAssets();
 
-if( !defined('MGS_THEME_UPG_VERSION') )             define('MGS_THEME_UPG_VERSION', '0.6.2');
+if( !defined('MGS_THEME_UPG_VERSION') )             define('MGS_THEME_UPG_VERSION', '0.6.3');
 if( !defined('MGS_THEME_UPG_BASENAME') )			define('MGS_THEME_UPG_BASENAME', plugin_basename(__FILE__));
 if( !defined('MGS_THEME_UPG_PLUGIN_DIR') ) 			define('MGS_THEME_UPG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 if( !defined('MGS_THEME_UPG_PLUGIN_DIR_URL') )		define('MGS_THEME_UPG_PLUGIN_DIR_URL', plugin_dir_url(__FILE__));
@@ -177,14 +177,13 @@ $config = [
 				'dependent'			=> 'addon-lightbox'
 			],
 			
-			//MGS BLOG SHORTCODE
-			'mgs-blog-shortcode'				=> [
+			//MGS STOPGUESTS
+			'mgs-stop-guests'				=> [
 				'wpml'				=> false,
 				'type'              => 'onoff',
-				'label'             => __('MGS Blog <i>Beta</i>', 'mgs-theme-upgrade'),
-				'desc'              => __('Crear listados de entradas o Custom Posts Types personalizadas.', 'mgs-theme-upgrade'),
+				'label'             => __('MGS StopGuests', 'mgs-theme-upgrade'),
+				'desc'              => __('Definir contenido esclusivo a usuarios registrados.', 'mgs-theme-upgrade'),
 				'def'               => '',
-				'more-help'			=> __('Beta: todavia sin implementar.', 'mgs-theme-upgrade'),
 			],
 		]
 	]
@@ -198,12 +197,23 @@ if( $mgs->get_field_value('addon-lightbox') ){
 	new MGS_LightBox_AddOn($mgs);
 }
 
+if( $mgs->get_field_value('mgs-stop-guests') ){
+	require_once('includes/mgs-stopguests/mgs-stopguests.php');
+	//require_once('includes/mgs-stopguests/mgs-stopguests-elementor.php');
+	new MGS_StopGuests($mgs);
+	//var_dump('mgs-stop-guests LOADED');
+}
+
 
 if( is_admin() ){
     require_once('class/class-mgs-admin.php');
 	require_once('class/class-admin.php');
 	new MGS_Theme_Upgrade_Admin($config);
 }
+
+
+
+
 
 register_activation_hook(__FILE__, 'mgs_tu_activation');
 register_deactivation_hook(__FILE__, 'mgs_tu_activation');

@@ -20,6 +20,8 @@ Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayo
 
 
 ## Change Log
+- ###### Version 0.6.3
+  - AddOn MGS StopGuests, permite establecer en la configuracion de una seccion si es privada o no.
 - ###### Version 0.6.2
   - FIX shortcode galeria
 - ###### Version 0.6.1
