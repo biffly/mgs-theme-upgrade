@@ -2,8 +2,17 @@
 //https://theme-fusion.com/documentation/avada/configure/add-new-settings-options-panel/
 if( class_exists('Fusion_Element') ){
 	class MGS_SotpGuests extends Fusion_Element{
+		public static $roles;
+		
 		public function __construct() {
 			parent::__construct();
+			global $wp_roles;
+			if( ! isset( $wp_roles ) ) $wp_roles = new WP_Roles();
+			self::$roles['todos'] = 'Cualquiera';
+			foreach( $wp_roles->roles as $k=>$v ){
+				self::$roles[$k] = $v['name'];
+			}
+			
 			add_filter('fusion_builder_element_params', [$this, 'MGS_SotpGuests_element_params'], 1, 2 );
 		}
 		
@@ -37,6 +46,22 @@ if( class_exists('Fusion_Element') ){
 							[
 								'element'	=> 'mgs_stopguests_enabled',
 								'value'		=> 'true',
+								'operator'	=> '==',
+							],
+						],
+					],
+					[
+						'type'			=> 'select',
+						'heading'		=> 'Role',
+						'description'	=> '',
+						'param_name'	=> 'mgs_stopguests_if_role',
+						'value'			=> self::$roles,
+						'default'		=> '',
+						'group'			=> 'MGS StopGuests',
+						'dependency'	=> [
+							[
+								'element'	=> 'mgs_stopguests_if',
+								'value'		=> 'if-logued',
 								'operator'	=> '==',
 							],
 						],

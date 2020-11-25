@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AACC,kBADiB,AAChB,OAAO,AAAA,CACP,OAAO,CAAE,IAAI,CACb",
+    "sources": [
+        "readmore.scss"
+    ],
+    "names": [],
+    "file": "readmore.css"
+}

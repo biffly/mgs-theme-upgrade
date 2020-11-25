@@ -2,7 +2,7 @@
 Tags: Upgrade, theme
 Requires at least: 4.7
 Tested up to: 5.5.1
-Stable tag: 0.6.3
+Stable tag: 0.6.4
 Requires PHP: 7.0
 License: BSD 2-Clause License
 License URI: https://github.com/biffly/mgs-theme-upgrade/blob/master/LICENSE
@@ -26,6 +26,8 @@ Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayo
 == Screenshots ==
 
 == Changelog ==
+- ###### Version 0.6.4
+  - AddOn MGS StopGuests, agregado opción para configurar una seccion para un role especifico.
 - ###### Version 0.6.3
   - AddOn MGS StopGuests, permite establecer en la configuracion de una seccion si es privada o no.
 - ###### Version 0.6.2

@@ -20,6 +20,8 @@ Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayo
 
 
 ## Change Log
+- ###### Version 0.6.4
+  - AddOn MGS StopGuests, agregado opción para configurar una seccion para un role especifico.
 - ###### Version 0.6.3
   - AddOn MGS StopGuests, permite establecer en la configuracion de una seccion si es privada o no.
 - ###### Version 0.6.2
