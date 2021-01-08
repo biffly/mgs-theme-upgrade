@@ -82,7 +82,9 @@ html[data-theme='dark']{
         padding: 0;
     }
 }
-
+#wpfooter{
+	color: var(--color-text);
+}
 
 .mgs-admin-warp{
     h1, h2, h3, h4{
@@ -102,8 +104,7 @@ html[data-theme='dark']{
         grid-template-columns: auto 300px;
         align-items: center;
         padding: 0 1rem;
-        background-color: var(--bg-panel);
-        border-bottom: solid 1px var(--color-menus);
+        background-color: var(--bg-panel); 
         .menu-left{
             display: flex;
             align-items: center;
@@ -189,11 +190,31 @@ html[data-theme='dark']{
         }
     }
 
+	#mgs-notice-bar{
+		.notice{
+			margin: 2em;
+			padding: 0.7em;
+			background-color: var(--bg-panel);
+			border-width: 0;
+			border-left-width: 5px;
+			p{
+				margin: .05em 0;
+				font-size: 1.1em;
+				color: var(--color-menus)
+			}
+		}
+	}
+	
+	form.mgs-form-options{
+		display: grid;
+		grid-template-columns: 2fr 1fr;
+	}
+	
     .mgs-admin-main{
         margin: 2rem;
         padding: 2rem;
         background-color: var(--bg-panel);
-        max-width: 1000px;
+        //max-width: 1000px;
         position: relative;
 		box-shadow: var(--main-shadow);
         .back-save{
@@ -251,20 +272,31 @@ html[data-theme='dark']{
                     .toogle{
                         grid-row: 0 1;
                     }
-                    .compativility{
-                        span{
+                    .compatibility{
+                        a{
                             display: inline-block;
                             height: 32px;
                             width: 32px;
                             margin-right: 8px;
+							text-indent: -99999px;
+							opacity: 0.2;
                             &.elementor{
                                 background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="%23db3157" d="M425.6 32H22.4C10 32 0 42 0 54.4v403.2C0 470 10 480 22.4 480h403.2c12.4 0 22.4-10 22.4-22.4V54.4C448 42 438 32 425.6 32M164.3 355.5h-39.8v-199h39.8v199zm159.3 0H204.1v-39.8h119.5v39.8zm0-79.6H204.1v-39.8h119.5v39.8zm0-79.7H204.1v-39.8h119.5v39.8z"></path></svg>');
+								&.elementor-1{
+									opacity: 1;
+								}
                             }
                             &.avada{
                                 background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><g><path fill="%2365bc7b" d="M124.53,3.68c40.69,52.52,45.82,127,14.92,176.68c-28.4,45.65-93.06,78.55-135.53,65.6C43.9,165.65,83.64,85.81,124.53,3.68z"/><path fill="%2365bc7b" d="M251.62,248.49c-25.75,0-47.06,2.28-67.64-0.63c-21.57-3.05-35.31-26.8-27.89-49.17c7.53-22.68,20.04-43.7,30.37-65.45c2.16-0.21,4.33-0.42,6.5-0.63C211.94,170.11,230.92,207.6,251.62,248.49z"/></g></svg>');
+								&.avada-1{
+									opacity: 1;
+								}
                             }
                             &.gutenberg{
                                 background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="%230073aa" d="M256 8C119.3 8 8 119.2 8 256c0 136.7 111.3 248 248 248s248-111.3 248-248C504 119.2 392.7 8 256 8zM33 256c0-32.3 6.9-63 19.3-90.7l106.4 291.4C84.3 420.5 33 344.2 33 256zm223 223c-21.9 0-43-3.2-63-9.1l66.9-194.4 68.5 187.8c.5 1.1 1 2.1 1.6 3.1-23.1 8.1-48 12.6-74 12.6zm30.7-327.5c13.4-.7 25.5-2.1 25.5-2.1 12-1.4 10.6-19.1-1.4-18.4 0 0-36.1 2.8-59.4 2.8-21.9 0-58.7-2.8-58.7-2.8-12-.7-13.4 17.7-1.4 18.4 0 0 11.4 1.4 23.4 2.1l34.7 95.2L200.6 393l-81.2-241.5c13.4-.7 25.5-2.1 25.5-2.1 12-1.4 10.6-19.1-1.4-18.4 0 0-36.1 2.8-59.4 2.8-4.2 0-9.1-.1-14.4-.3C109.6 73 178.1 33 256 33c58 0 110.9 22.2 150.6 58.5-1-.1-1.9-.2-2.9-.2-21.9 0-37.4 19.1-37.4 39.6 0 18.4 10.6 33.9 21.9 52.3 8.5 14.8 18.4 33.9 18.4 61.5 0 19.1-7.3 41.2-17 72.1l-22.2 74.3-80.7-239.6zm81.4 297.2l68.1-196.9c12.7-31.8 17-57.2 17-79.9 0-8.2-.5-15.8-1.5-22.9 17.4 31.8 27.3 68.2 27.3 107 0 82.3-44.6 154.1-110.9 192.7z"></path></svg>');
+								&.gutenberg-1{
+									opacity: 1;
+								}
                             }
                         }
                     }
@@ -286,6 +318,25 @@ html[data-theme='dark']{
                             }
                         }
                     }
+					&.not-compatibility{
+						cursor: not-allowed;
+						padding-top: 35px;
+						&::after{
+							content: 'Esta opción no es compatible con su tema.';
+							display: block;
+							background-color: darkred;
+							position: absolute;
+							left: 0; right: 0;
+							top: 0; height: 30px;
+							font-size: 16px;
+							padding: 4px 10px;
+							text-align: center;
+						}
+						.toogle{
+							opacity: 0.5;
+							pointer-events: none;
+						}
+					}
                 }
             }
         }
@@ -306,6 +357,65 @@ html[data-theme='dark']{
                 }
             }
         }
+		
+		&.cards{
+			grid-row: 1/3;
+			grid-column: 2;
+			margin: 0;
+			box-shadow: none;
+			background-color: transparent;
+			display: grid;
+			grid-template-columns: 1fr 1fr;
+			grid-gap: 3rem;
+			.mgs-card{
+				background-color: var(--bg-panel);
+				border-radius: 15px;
+				box-shadow: var(--main-shadow);
+				padding: 1rem 2rem;
+				z-index: 10;
+				h2{
+					font-size: 18px;
+				}
+				.card-cmd{
+					border-radius: 4px;
+					border: none;
+					background-color: var(--cmd-bg);
+					color: var(--cmd-text);
+					padding: 8px 26px;
+					text-transform: uppercase;
+					font-weight: 300;
+					cursor: pointer;
+					display: block;
+					font-size: 0.8em;
+					text-align: center;
+				}
+				&.paypal{
+					position: relative;
+					background-color: #00457C;
+					h2{
+						text-align: center;
+						color: #fff;
+					}
+					.coffee{
+						background-image: url("../imgs/coffee.svg");
+						background-position: center center;
+						background-repeat: no-repeat;
+						background-size: contain;
+						position: absolute;
+						left: 10px; right: 10px;
+						height: 50%;
+						top: 50%; transform: translateY(-50%);
+						z-index: -1;
+					}
+					.buy-me-a-coffee{
+						position: absolute;
+						bottom: 1rem;
+						left: 2rem; right: 2rem;
+						background-color: #0079C1;
+					}
+				}
+			}
+		}
     }
 }
 

@@ -16,9 +16,9 @@ if( !class_exists('MGS_Theme_Upgrade') ){
 		public function __construct($config){
 			$this->plg_name = MGS_THEME_UPG_NAME;
 			$this->build_options($config);
-			$this->on_load();
 			$this->add_actions();
 			$this->add_filters();
+			add_action('plugins_loaded', [$this, 'on_plugins_loaded']);
 		}
 		
 		public function add_actions(){
@@ -84,14 +84,15 @@ if( !class_exists('MGS_Theme_Upgrade') ){
                 });
             }
         }
-		
-		public function on_load(){
-            self::$compatibility = [
-                'elementor'     => ( did_action('elementor/loaded') )   ? true : false ,
-                'avada'         => ( class_exists('FusionBuilder') )    ? true : false ,
-                'wpml'          => ( function_exists('icl_object_id') ) ? true : false ,
-            ];
-        }
+				
+		public function chech_compatibility($setting){
+			foreach( self::$compatibility as $c=>$b ){
+				if( in_array($c, $setting) && $b==true ){
+					return true;
+				}
+			}
+			return false;
+		}
         
 		public function get_field_name($id){
             if( self::$compatibility['wpml'] && $this->settings[$id]['wpml'] ){
@@ -118,5 +119,28 @@ if( !class_exists('MGS_Theme_Upgrade') ){
 				}
 			}
 		}
+		
+		public function on_plugins_loaded(){
+			self::$compatibility['gutenberg'] = true;
+			self::$compatibility['elementor'] = $this->is_elementor();
+			self::$compatibility['avada'] = ( class_exists('FusionBuilder') ) ? true : false;
+            self::$compatibility['wpml'] = ( function_exists('icl_object_id') ) ? true : false;
+			//var_dump(self::$compatibility);
+		}
+		
+		public function is_elementor(){
+			// Check if Elementor installed and activated
+			if( !did_action('elementor/loaded') ){
+				return false;
+			}
+
+			// Check for required Elementor version
+			if( !version_compare(ELEMENTOR_VERSION, MGS_MINIMUM_ELEMENTOR_VERSION, '>=') ){
+				return false;
+			}
+			
+			return true;
+		}
+		
 	}
 }

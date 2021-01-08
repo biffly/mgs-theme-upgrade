@@ -32,6 +32,7 @@ if( !class_exists('MGS_LightBox_AddOn') ){
 			add_shortcode('mgs_gallery_lightbox_addon', [$this, 'mgs_gallery_lightbox_addon_build']);
 			
 			
+			
 			//ADD ADMIN OPTIONS
 			if( is_admin() ){
 				self::$mce_js_url = MGS_LIGHTBOX_ADDON_DIR_URL.'assets/js/mgs-tinymce.js';
@@ -253,12 +254,17 @@ if( !class_exists('MGS_LightBox_AddOn') ){
 		
 		private function get_attachment_info($attachment_id){
 			$attachment = get_post($attachment_id);
+			if( self::$ACF ){
+				$desc = get_field('field_5f6e180c9ffca', $attachment_id);
+			}else{
+				$desc = $attachment->post_content;
+			}
 			return [
     			'alt'			=> ( get_post_meta($attachment->ID, '_wp_attachment_image_alt', true) ) ? ( get_post_meta($attachment->ID, '_wp_attachment_image_alt', true) ) : $attachment->post_title,
 				'caption'		=> $attachment->post_excerpt,
 				'desc'			=> $attachment->post_content,
 				'title'			=> $attachment->post_title,
-				'desc_html'		=> get_field('field_5f6e180c9ffca', $attachment_id)
+				'desc_html'		=> $desc
 			];
 		}
 		
@@ -323,6 +329,7 @@ if( !class_exists('MGS_LightBox_AddOn') ){
 			$plugin_array['mgs_lightbox_mce_button'] = self::$mce_js_url;
     		return $plugin_array;
 		}
+		
 		public function mce_shortcode_button_init_mce_buttons($buttons){
 			$screen = get_current_screen();
 			if( !current_user_can('edit_posts') && !current_user_can('edit_pages') && get_user_option('rich_editing') == 'true' && $screen->parent_file=='edit.php' && $screen->post_type=='post' ) return;

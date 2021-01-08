@@ -3,7 +3,7 @@
 Plugin Name: MGS Theme Upgrade
 Plugin URI: https://github.com/biffly/mgs-theme-upgrade/
 Description: Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayoria de los themas premiun no dejan.
-Version: 0.6.4
+Version: 0.6.6
 Author: Marcelo Scenna
 Author URI: http://www.marceloscenna.com.ar
 Text Domain: mgs-theme-upgrade
@@ -20,12 +20,16 @@ $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
 );
 $myUpdateChecker->getVcsApi()->enableReleaseAssets();
 
-if( !defined('MGS_THEME_UPG_VERSION') )             define('MGS_THEME_UPG_VERSION', '0.6.4');
+if( !defined('MGS_THEME_UPG_VERSION') )             define('MGS_THEME_UPG_VERSION', '0.6.6');
 if( !defined('MGS_THEME_UPG_BASENAME') )			define('MGS_THEME_UPG_BASENAME', plugin_basename(__FILE__));
 if( !defined('MGS_THEME_UPG_PLUGIN_DIR') ) 			define('MGS_THEME_UPG_PLUGIN_DIR', plugin_dir_path(__FILE__));
 if( !defined('MGS_THEME_UPG_PLUGIN_DIR_URL') )		define('MGS_THEME_UPG_PLUGIN_DIR_URL', plugin_dir_url(__FILE__));
 if( !defined('MGS_THEME_UPG_GIT') )             	define('MGS_THEME_UPG_GIT', 'biffly/mgs-theme-upgrade');
 if( !defined('MGS_THEME_UPG_NAME') )             	define('MGS_THEME_UPG_NAME', 'MGS-Theme-Upgrade');
+if( !defined('MGS_MINIMUM_ELEMENTOR_VERSION') )		define('MGS_MINIMUM_ELEMENTOR_VERSION', '3.0.0');
+if( !defined('MGS_MINIMUM_PHP_VERSION') )			define('MGS_MINIMUM_PHP_VERSION', '7.3.0');
+
+
 
 
 if( !get_option(MGS_THEME_UPG_NAME.'-mgs-tu-default-images-sizes') ) update_option(MGS_THEME_UPG_NAME.'-mgs-tu-default-images-sizes', mgs_tu_get_all_image_sizes());
@@ -166,6 +170,7 @@ $config = [
 				'label'             => __('MGS Lightbox', 'mgs-theme-upgrade'),
 				'desc'              => __('Opción que permite mostrar en un lightbox la meta información de una imagen.', 'mgs-theme-upgrade'),
 				'def'               => '',
+				'compatibility'		=> ['avada', 'elementor', 'gutenberg'],
 			],
 			'addon-lightbox-moreinfo-enabled'	=> [
 				'wpml'              => false,
@@ -184,13 +189,31 @@ $config = [
 				'label'             => __('MGS StopGuests', 'mgs-theme-upgrade'),
 				'desc'              => __('Definir contenido esclusivo a usuarios registrados.', 'mgs-theme-upgrade'),
 				'def'               => '',
+				'compatibility'		=> ['avada', 'elementor'],
+			],
+			
+			//MGS FORMS
+			'mgs-forms'				=> [
+				'wpml'				=> false,
+				'type'              => 'onoff',
+				'label'             => __('MGS Forms', 'mgs-theme-upgrade'),
+				'desc'              => __('Crea formularios.', 'mgs-theme-upgrade'),
+				'def'               => '',
 			],
 		]
 	]
 ];
 
+global $mgs;
 require_once('class/class-main.php');
 $mgs = new MGS_Theme_Upgrade($config);
+
+
+if( is_admin() ){
+    require_once('class/class-mgs-admin.php');
+	require_once('class/class-admin.php');
+	new MGS_Theme_Upgrade_Admin($config);
+}
 
 if( $mgs->get_field_value('addon-lightbox') ){
 	require_once('includes/mgs-lightbox/mgs-lightbox.php');
@@ -202,22 +225,13 @@ if( $mgs->get_field_value('mgs-stop-guests') ){
 	new MGS_StopGuests($mgs);
 }
 
-
-if( is_admin() ){
-    require_once('class/class-mgs-admin.php');
-	require_once('class/class-admin.php');
-	new MGS_Theme_Upgrade_Admin($config);
+if( $mgs->get_field_value('mgs-forms') ){
+	require_once('includes/mgs-forms/mgs-forms.php');
+	new MGS_Forms($mgs);
 }
-
-
-
-
 
 register_activation_hook(__FILE__, 'mgs_tu_activation');
 register_deactivation_hook(__FILE__, 'mgs_tu_activation');
-
-
-
 
 function mgs_tu_activation(){
     delete_option(MGS_THEME_UPG_NAME.'-mgs-tu-default-images-sizes');

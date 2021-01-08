@@ -1,0 +1,97 @@
+.mgs-forms-wrapper{
+    form{
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        grid-gap: 1em;
+        .mgs-forms-item{
+            font-weight: 300;
+            font-size: 1em;
+
+            input[type=date],
+            input[type=email],
+            input[type=number],
+            input[type=password],
+            input[type=phone-number],
+            input[type=text],
+            select,
+            textarea{
+                border-radius: 0.3em;
+                border: solid 1px darkslategrey;
+                background-color: white;
+                font-size: 1.2em;
+                color: darkslategrey;
+                width: 100%;
+                outline: 0;
+                padding: 0.5em;
+                line-height: 1em;
+                height: 50px;
+                box-sizing: border-box;
+                &:focus{
+                    box-shadow: none;
+                    border-color: royalblue;
+                }
+            }
+            textarea{height: auto;}
+
+            .help{
+                font-size: 0.9em;
+                margin: 0;
+            }
+
+            .checkbox, .radio{
+                label{
+                    cursor: pointer;
+                }
+
+                &.inline{
+                    display: inline;
+                }
+
+                &.FontAwesomeReplace{
+                    input[type="checkbox"], input[type="radio"]{
+                        display: none;
+                        + label:before {
+                            font-family: "Font Awesome 5 Free";
+                            display: inline-block;
+                            content: "\f0c8";
+                            letter-spacing: 5px;
+                            font-size: 1.3em;
+                        }
+                        &:checked{
+                            + label:before {
+                                content: "\f14a";
+                            }
+                        }
+                    }
+                    input[type="radio"]{
+                        + label:before {content: "\f111";}
+                        &:checked{
+                            + label:before {
+                                content: "\f058";
+                            }
+                        }
+                    }
+                }
+            }
+
+            .mgs-forms-label{
+                font-weight: 700;
+                cursor: pointer;
+
+                .required{
+                    color: red;
+                }
+            }
+
+            &.mgs-col-12{
+                grid-column: span 12;
+            }
+            &.mgs-col-6{
+                grid-column: span 6;
+            }
+            &.mgs-col-4{
+                grid-column: span 4;
+            }
+        }
+    }
+}

@@ -20,6 +20,10 @@ Permite agregar funcionalidades nuevas a su tema y controlar algunas que la mayo
 
 
 ## Change Log
+- ###### Version 0.6.6
+  - AddOn MGS Forms, Liberado para pruebas, en estado Beta.
+- ###### Version 0.6.5
+  - AddOn MGS Lightbox, FIX issue con las opciones de contenido HTML.
 - ###### Version 0.6.4
   - AddOn MGS StopGuests, agregado opción para configurar una seccion para un role especifico.
 - ###### Version 0.6.3

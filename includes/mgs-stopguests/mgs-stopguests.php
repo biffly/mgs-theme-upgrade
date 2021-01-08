@@ -28,9 +28,6 @@ if( !class_exists('MGS_StopGuests') ){
 			foreach( $wp_roles->roles as $k=>$v ){
 				self::$roles[$k] = $v['name'];
 			}
-			
-	
-		
 		
 			//carga configuracion y opciones
 			$this->parent = $parent;
@@ -137,7 +134,6 @@ if( !class_exists('MGS_StopGuests') ){
 			return $hide;
 			
 		}
-		
 		
 		public function mgs_sotop_guests_register_styles_editor(){
 			wp_enqueue_style('mgs_stop_guests_ele_editor_css', MGS_STOPGUESTS_DIR_URL.'assets/css/admin.css', ['elementor-editor'], self::VERSION);

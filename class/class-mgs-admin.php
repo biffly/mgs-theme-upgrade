@@ -11,13 +11,11 @@ if( !class_exists('MGS_Admin_Class') ){
 		public $settings;
 		public static $compatibility;
 		public $raw_settings;
+		public $base_config;
+		
+		public $mgs;
 		
 		public function __construct(){
-			self::$compatibility = [
-                'elementor'     => ( did_action('elementor/loaded') )   ? true : false ,
-                'avada'         => ( class_exists('FusionBuilder') )    ? true : false ,
-                'wpml'          => ( function_exists('icl_object_id') ) ? true : false ,
-            ];
         }
 		
 		public function load(){
@@ -28,7 +26,7 @@ if( !class_exists('MGS_Admin_Class') ){
 			}, 1);
 			add_action('wp_ajax_mgs_admin_save_settings', [$this, 'mgs_admin_save_settings_callback']);
 		}
-
+		
 		public function mgs_admin_save_settings_callback(){
 			parse_str($_POST['data'], $posts);
 			if( is_user_logged_in() && wp_verify_nonce($posts['_wpnonce'], 'mgs-admin-nonce') ){
@@ -66,7 +64,7 @@ if( !class_exists('MGS_Admin_Class') ){
 						</li>
 						<?php if( version_compare($this->plg_ver, $git->tag_name)<0 ){?>
 						<li class="git">
-							<span>V <?php echo $git->tag_name?></span>
+							<span>V<?php echo $git->tag_name?></span>
 							<a href="#"><i class="fas fa-sync"></i></a>
 						</li>
 						<?php }?>
@@ -77,9 +75,10 @@ if( !class_exists('MGS_Admin_Class') ){
 						</li>
 					</ul>
 				</div>
+				<div id="mgs-notice-bar"><h2></h2></div>
 				<form method="post" action="#" class="mgs-form-options" id="mgs-form-options">
 					<div class="mgs-admin-main">
-					<div class="back-save"></div>
+						<div class="back-save"></div>
                         <?php //settings_fields($this->plg_name.'_options');?>
 						<input type="hidden" id="_wpnonce" name="_wpnonce" value="<?php echo wp_create_nonce('mgs-admin-nonce')?>">
 						<div class="mgs-admin-tabs">
@@ -114,6 +113,13 @@ if( !class_exists('MGS_Admin_Class') ){
 							</div>
 						</div>
 						<div class="action"><button type="submit" class="submit-options"><?php echo __('Guardar cambios', 'mgs-admin')?></button></div>
+					</div>
+					<div class="mgs-admin-main cards">
+						<div class="mgs-card paypal">
+							<h2>Si este Plugin te resulto útil, puedes invitarme un cafe!</h2>
+							<div class="coffee"></div>
+							<a href="https://www.paypal.com/donate/?hosted_button_id=JAPKZNZEYZFN2" target="_blank" class="card-cmd buy-me-a-coffee" title="Cómprame un café">Cómprame un café</a>
+						</div>
 					</div>
 				</form>
 			</div>
@@ -266,26 +272,31 @@ if( !class_exists('MGS_Admin_Class') ){
 			foreach( $this->settings as $id_seccion=>$attrs ){
 				$out .= '
 					<div class="ui tab" data-tab="'.$id_seccion.'" id="tab-content-'.$id_seccion.'">
-						<h2 class="title-seccion">'.$attrs['label'].'</h2>
-						<div class="list-settings">'.$this->build_setting_seccion($attrs['fields']).'</div>
+						<div class="title-seccion">'.$attrs['label'].'</div>
+						<div class="list-settings">'.$this->build_setting_seccion($attrs['fields'], $id_seccion).'</div>
 					</div>
 				';
 			}
 			return $out;
 		}
 		
-		private function build_setting_seccion($attrs){
+		private function build_setting_seccion($attrs, $id_section){
 			$out = '';
 			if( !$attrs ) return;
 			foreach( $attrs as $id=>$ops ){
-				$out .= $this->open_setting_section($ops);
-				$out .= $this->label($ops, $id);
+				//$out .= '<pre>'.print_r($attrs, true).'</pre>';
+				$out .= $this->open_setting_section($ops, $id_section, $id);
+				$out .= $this->label($ops, $id_section, $id);
 				if( $this->is_dependent($ops) ){
 					$out .= '<div class="value">'.$this->build_fields($ops, $id).'</div>';
 				}else{
+					
+					/*if( $this->chech_compatibility($id) ){
+						
+					}*/
 					$out .= '<div class="toogle">'.$this->build_fields($ops, $id).'</div>';
 				}
-				$out .= $this->close_setting_section($ops);
+				$out .= $this->close_setting_section($ops, $id_section, $id);
 			}
 			return $out;
 		}
@@ -313,6 +324,21 @@ if( !class_exists('MGS_Admin_Class') ){
 					break;
 			}
 			return $out;
+		}
+		
+		public function chech_compatibility($setting){
+			// Verifico que el array de compatibilidad este establecido.
+			// Si esta establecido continuo con la verificacion.
+			// Si no existe o no esta establecido es porque el elemento 
+			// es compatible o no hace falta verificar
+			if( !is_array($setting) ) return true;
+			
+			foreach( self::$compatibility as $c=>$b ){
+				if( in_array($c, $setting) && $b==true ){
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		private function _onoff($id, $ops){
@@ -383,7 +409,7 @@ if( !class_exists('MGS_Admin_Class') ){
             return $out;
         }
 		
-		private function label($ops, $id){
+		private function label($ops, $id_section, $id){
             $name = $this->get_field_name($id, $ops);
             $out .= '
 				<div class="title">
@@ -394,28 +420,40 @@ if( !class_exists('MGS_Admin_Class') ){
 			return $out;
         }
 		
-		private function Label_WPML($ops){
+		public function Label_WPML($ops){
             if( self::$compatibility['wpml'] && $ops['wpml'] ){
                 return ' <span class="dashicons dashicons-translation" aria-hidden="true"></span>';
             }
         }
 		
-		private function open_setting_section($ops, $class=''){
+		private function open_setting_section($ops, $id_section, $id, $class=''){
 			$data = '';
 			$after = '';
-			$class .= ' setting';
+			$class .= ' setting setting-'.$id;
 			if( $ops['dependent']!='' ){
 				$class .= ' dependent mgs-admin-row-dependent';
 				$data = 'data-dependent="'.$this->get_field_name($ops['dependent'], $ops).'"';
 				$after = '<div class="inner">';
+			}elseif( !$this->chech_compatibility($this->settings[$id_section]['fields'][$id]['compatibility']) ){
+				$class .= ' not-compatibility';
 			}
 			return '<div class="'.$class.'" '.$data.'>'.$after;
         }
 		
-		private function close_setting_section($ops){
+		private function close_setting_section($ops, $id_section, $id){
 			$before = '';
 			if( $ops['dependent']!='' ){
 				$before = '</div><!-- inner -->';
+			}else{
+				if( is_array($this->settings[$id_section]['fields'][$id]['compatibility']) ){
+					$before = '<div class="compatibility">';
+					//$before .= '<pre>'.print_r($this->settings[$id_section]['fields'][$id]['compatibility'], true).'</pre>';
+					//$before .= '<pre>'.print_r(self::$compatibility, true).'</pre>';
+					foreach( $this->settings[$id_section]['fields'][$id]['compatibility'] as $theme ){
+						$before .= '<a class="'.$theme.' '.$theme.'-'.self::$compatibility[$theme].'" title="'.$theme.'">'.$theme.'</a>';
+					}
+					$before .= '</div>';
+				}
 			}
 			return $before.'</div>';
 		}
@@ -433,7 +471,7 @@ if( !class_exists('MGS_Admin_Class') ){
 		public function enqueue_scripts($hook){
 			if( $hook=='settings_page_'.$this->slug ){
 				wp_enqueue_script('jquery');
-				wp_enqueue_script('kit-fontawesome', 'https://kit.fontawesome.com/432b91a985.js');
+				
 				wp_enqueue_script('semantic-ui-js', $this->plg_url.'assets/js/semantic.min.js', ['jquery']);
 				wp_enqueue_script('jquery-address-js', $this->plg_url.'assets/js/jquery.address.js', ['semantic-ui-js']);
 				wp_enqueue_script('jquery-validate-js', $this->plg_url.'assets/js/jquery.validate.min.js', ['jquery']);
@@ -445,11 +483,12 @@ if( !class_exists('MGS_Admin_Class') ){
 
                 wp_enqueue_style('semantic-ui-css', $this->plg_url.'assets/css/semantic.min.css');
                 wp_enqueue_style('mgs-admin-css', $this->plg_url.'assets/css/admin2.css');
-				
-			}			
+			}
+			wp_enqueue_script('kit-fontawesome', 'https://kit.fontawesome.com/432b91a985.js');
+			wp_enqueue_style('mgs-all-admin-css', $this->plg_url.'assets/css/admin.css');
 		}
 		
-		private function is_dependent($ops){
+		public function is_dependent($ops){
 			return ( $ops['dependent']!='' ) ? true : false;
 		}
 		
@@ -527,6 +566,7 @@ if( !class_exists('MGS_Admin_Class') ){
             if( $val=='' ) $val = $ops['def'];
             return $val;
         }
+		
 	}
 	new MGS_Admin_Class();
 }
