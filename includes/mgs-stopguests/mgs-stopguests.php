@@ -228,8 +228,7 @@ if( !class_exists('MGS_StopGuests') ){
 					]
 				]
 			);
-			
-			
+
 			
 			
 			

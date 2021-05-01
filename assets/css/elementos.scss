@@ -1,3 +1,24 @@
+@mixin button {
+    padding: 11px 30px !important;
+    border-radius: 0.35em;
+    background-color: var(--cmd-bg);
+    color: var(--cmd-text);
+    text-decoration: none;
+    outline: none;
+    border: solid 1px transparent;
+    transition: background-color 0.2s cubic-bezier(0.21, 0.6, 0.35, 1);
+    box-shadow: var(--content-shadow);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1em !important;
+    &:hover{
+        color: var(--cmd-bg);
+        background-color: var(--cmd-text);
+        border: var(--border-input-color) solid 1px;
+    }
+}
+
 .switch-theme, .mgs-switch{
     input[type=checkbox]{
         height: 0;
@@ -74,20 +95,31 @@
     }
 }
 
-.mgs-input-warper{
+.mgs-admin-warp{
     input[type="text"],
     input[type="mail"],
-    input[type="number"]{
+    input[type="number"],
+    select{
         width: 100%;
         height: 40px;
         font-size: 18px;
         line-height: 40px;
-        border: none;
-        border-radius: 0;
-        background-color: var(--bg);
+        border: 1px solid var(--border-input-color);
+        border-radius: 0.4rem; 
+        background-color: transparent;
         color: var(--color-text);
         margin: 0;
         padding: 0 16px;
+    }
+    select{
+        font-size: 16px;
+    }
+    .button{
+        @include button;
+        &.button-large{font-size: 20px;}
+        &.button-full-width{width: 100%;}
+
+
     }
 }
 
@@ -127,7 +159,12 @@
     }
 }
 
-button[type="submit"]{
+.mgs-admin-btn{
+    @include button;
+}
+
+
+/*button[type="submit"]{
     border: none;
     background-color: var(--cmd-bg);
     color: var(--cmd-text);
@@ -143,4 +180,4 @@ button[type="submit"]{
         background-color: var(--bg);
         color: var(--text-color);
     }
-}
+}*/

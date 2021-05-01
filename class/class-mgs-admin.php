@@ -1,5 +1,5 @@
 <?php
-//version 1.1
+//version 1.2
 if( !class_exists('MGS_Admin_Class') ){
 	class MGS_Admin_Class{
 		public $slug;
@@ -12,6 +12,7 @@ if( !class_exists('MGS_Admin_Class') ){
 		public static $compatibility;
 		public $raw_settings;
 		public $base_config;
+		private $hook_styles;
 		
 		public $mgs;
 		
@@ -30,7 +31,7 @@ if( !class_exists('MGS_Admin_Class') ){
 		public function mgs_admin_save_settings_callback(){
 			parse_str($_POST['data'], $posts);
 			if( is_user_logged_in() && wp_verify_nonce($posts['_wpnonce'], 'mgs-admin-nonce') ){
-				foreach( $this->$raw_settings as $key=>$value ){
+				foreach( $this->raw_settings as $key=>$value ){
 					if( isset($posts[$key]) ){
 						update_option($key, $posts[$key]);
 					}else{
@@ -46,38 +47,80 @@ if( !class_exists('MGS_Admin_Class') ){
 			die();
 		}
 		
-		public function page(){
+		public function page($content=''){
 			$git = $this->get_git();
             ?>
         	<div class="wrap mgs-admin-warp">
-				<div class="mgs-top-bar">
-					<ul class="menu-left">
-						<li class="brand">
-							<span class="logo"></span>
-							<span class="text">MGS Theme Upgrade</span>
-						</li>
-						<?php echo $this->build_menu()?>
-					</ul>
-					<ul class="menu-right">
-						<li class="version">
-							<span>V <?php echo $this->plg_ver?></span>
-						</li>
-						<?php if( version_compare($this->plg_ver, $git->tag_name)<0 ){?>
-						<li class="git">
-							<span>V<?php echo $git->tag_name?></span>
-							<a href="#"><i class="fas fa-sync"></i></a>
-						</li>
-						<?php }?>
-						<li class="theme">
-							<div class="switch-theme">
-								<input type="checkbox" id="switch-theme" name="switch-theme"/><label for="switch-theme">Toggle</label>
-							</div>
-						</li>
-					</ul>
-				</div>
+				<?php $this->build_head()?>
 				<div id="mgs-notice-bar"><h2></h2></div>
+				<?php
+				if( $content!='' ){
+					echo $content;
+				}else{
+					$this->form_options();
+				}
+				?>
+				<script>
+					var switch_theme = document.querySelector('input[name=switch-theme]');
+					var theme = getCookie('mgs-admin-theme');
+
+					let trans = () => {
+						document.documentElement.classList.add('transition');
+						window.setTimeout(() => {
+							document.documentElement.classList.remove('transition')
+						}, 500)
+					}
+
+
+					if( theme=='' ){
+						theme = 'light';
+					}
+					if( theme=='dark'){
+						switch_theme.checked = true;
+					}
+					trans();
+					document.documentElement.setAttribute('data-theme', theme);
+
+					switch_theme.addEventListener('change', function() {
+						if( this.checked ){
+							trans();
+							document.documentElement.setAttribute('data-theme', 'dark');
+							setCookie('mgs-admin-theme','dark',365);
+						}else{
+							trans();
+							document.documentElement.setAttribute('data-theme', 'light')
+							setCookie('mgs-admin-theme','light',365);
+						}
+					})
+
+					function setCookie(name,value,days) {
+						var expires = "";
+						if (days) {
+							var date = new Date();
+							date.setTime(date.getTime() + (days*24*60*60*1000));
+							expires = "; expires=" + date.toUTCString();
+						}
+						document.cookie = name + "=" + (value || "")  + expires + "; path=/";
+					}
+					function getCookie(name) {
+						var nameEQ = name + "=";
+						var ca = document.cookie.split(';');
+						for(var i=0;i < ca.length;i++) {
+							var c = ca[i];
+							while (c.charAt(0)==' ') c = c.substring(1,c.length);
+							if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+						}
+						return null;
+					}
+				</script>
+			</div>
+			<?php
+		}
+
+		private function form_options(){
+			?>
 				<form method="post" action="#" class="mgs-form-options" id="mgs-form-options">
-					<div class="mgs-admin-main">
+					<div class="mgs-admin-main content-style border-top-left-radius border-top-right-radius border-bottom-left-radius border-bottom-right-radius margin-bottom">
 						<div class="back-save"></div>
                         <?php //settings_fields($this->plg_name.'_options');?>
 						<input type="hidden" id="_wpnonce" name="_wpnonce" value="<?php echo wp_create_nonce('mgs-admin-nonce')?>">
@@ -85,7 +128,7 @@ if( !class_exists('MGS_Admin_Class') ){
 							<?php echo $this->build_tabs()?>
 						</div>
 					</div>
-					<div class=" mgs-admin-main mgs-admin-save">
+					<div class=" mgs-admin-main mgs-admin-save content-style border-top-left-radius border-top-right-radius border-bottom-left-radius border-bottom-right-radius margin-bottom">
 						<div id="alert-warper">
 							<div class="aviso-loading">
 								<div class="ui icon message green">
@@ -112,7 +155,7 @@ if( !class_exists('MGS_Admin_Class') ){
 								</div>
 							</div>
 						</div>
-						<div class="action"><button type="submit" class="submit-options"><?php echo __('Guardar cambios', 'mgs-admin')?></button></div>
+						<div class="action"><button type="submit" class="submit-options mgs-admin-btn"><?php echo __('Guardar cambios', 'mgs-admin')?></button></div>
 					</div>
 					<div class="mgs-admin-main cards">
 						<div class="mgs-card paypal">
@@ -122,130 +165,156 @@ if( !class_exists('MGS_Admin_Class') ){
 						</div>
 					</div>
 				</form>
-			</div>
-			<script>
-				var switch_theme = document.querySelector('input[name=switch-theme]');
-				var theme = getCookie('mgs-admin-theme');
-
-				let trans = () => {
-					document.documentElement.classList.add('transition');
-					window.setTimeout(() => {
-						document.documentElement.classList.remove('transition')
-					}, 500)
-				}
-
-
-				if( theme=='' ){
-					theme = 'light';
-				}
-				if( theme=='dark'){
-					switch_theme.checked = true;
-				}
-				trans();
-				document.documentElement.setAttribute('data-theme', theme);
-
-				switch_theme.addEventListener('change', function() {
-					if( this.checked ){
-						trans();
-						document.documentElement.setAttribute('data-theme', 'dark');
-						setCookie('mgs-admin-theme','dark',365);
-					}else{
-						trans();
-						document.documentElement.setAttribute('data-theme', 'light')
-						setCookie('mgs-admin-theme','light',365);
-					}
-				})
-
-				
-				jQuery(document).ready(function(){
-					jQuery('.menu-left .item').tab({
-						history		: true,
-						historyType	: 'hash',
-						show		: { effect: "blind", duration: 800 },
-						hide		: 'fade'
-					});
-					
-					dependent_check();
-                                
-					jQuery('.mgs-admin-dependent-tigger').on('change', function(){
+				<script>
+					jQuery(document).ready(function(){
+						jQuery('.menu-left .item').tab({
+							history		: true,
+							historyType	: 'hash',
+							show		: { effect: "blind", duration: 800 },
+							hide		: 'fade'
+						});
+						
 						dependent_check();
-					});
+									
+						jQuery('.mgs-admin-dependent-tigger').on('change', function(){
+							dependent_check();
+						});
 
-					jQuery('#mgs-form-options').on('submit', function(e){
-						e.preventDefault();
-						jQuery('.submit-options').prop('disabled', 'disabled');
-						jQuery('#alert-warper .aviso-loading').fadeIn();
-						jQuery('.back-save').fadeIn(200);
-						jQuery.ajax({
-							type		: "post",
-							url			: mgs_ajax.ajaxurl,
-							data		: {
-								action		: 'mgs_admin_save_settings',
-								data 		: jQuery(this).serialize()
-							}
-						}).done(function(data){
-							if( data=='ok' ){
-								jQuery('#alert-warper .aviso-loading').fadeOut(1);
-								jQuery('#alert-warper .aviso-ok').fadeIn();
-								jQuery('.back-save').fadeOut(200);
-								jQuery('.submit-options').prop('disabled', '');
-								setTimeout(function(){jQuery('#alert-warper .aviso-ok').fadeOut();}, 5000);
-							}else{
+						jQuery('#mgs-form-options').on('submit', function(e){
+							e.preventDefault();
+							jQuery('.submit-options').prop('disabled', 'disabled');
+							jQuery('#alert-warper .aviso-loading').fadeIn();
+							jQuery('.back-save').fadeIn(200);
+							jQuery.ajax({
+								type		: "post",
+								url			: mgs_ajax.ajaxurl,
+								data		: {
+									action		: 'mgs_admin_save_settings',
+									data 		: jQuery(this).serialize()
+								}
+							}).done(function(data){
+								if( data=='ok' ){
+									jQuery('#alert-warper .aviso-loading').fadeOut(1);
+									jQuery('#alert-warper .aviso-ok').fadeIn();
+									jQuery('.back-save').fadeOut(200);
+									jQuery('.submit-options').prop('disabled', '');
+									location.reload();
+									setTimeout(function(){jQuery('#alert-warper .aviso-ok').fadeOut();}, 5000);
+								}else{
+									jQuery('#alert-warper .aviso-loading').fadeOut(1);
+									jQuery('#alert-warper .aviso-error').fadeIn();
+									jQuery('.back-save').fadeOut(200);
+									jQuery('.submit-options').prop('disabled', '');
+									setTimeout(function(){jQuery('#alert-warper .aviso-error').fadeOut();}, 5000);
+								}
+							}).fail(function(data){
 								jQuery('#alert-warper .aviso-loading').fadeOut(1);
 								jQuery('#alert-warper .aviso-error').fadeIn();
 								jQuery('.back-save').fadeOut(200);
 								jQuery('.submit-options').prop('disabled', '');
 								setTimeout(function(){jQuery('#alert-warper .aviso-error').fadeOut();}, 5000);
-							}
-						}).fail(function(data){
-							jQuery('#alert-warper .aviso-loading').fadeOut(1);
-							jQuery('#alert-warper .aviso-error').fadeIn();
-							jQuery('.back-save').fadeOut(200);
-							jQuery('.submit-options').prop('disabled', '');
-							setTimeout(function(){jQuery('#alert-warper .aviso-error').fadeOut();}, 5000);
-						}); 
+							}); 
+						});
 					});
-				});
 
-
-
-
-				function dependent_check(){
-					jQuery('.mgs-admin-row-dependent').each(function(){
-						if( jQuery(this).data('dependent')!='' ){
-							var dependent = jQuery(this).data('dependent');
-							jQuery('#'+dependent).addClass('mgs-admin-dependent-tigger');
-							if( !jQuery('#'+dependent).is(':checked') ){
-								jQuery(this).fadeOut('fast');
-							}else{
-								jQuery(this).fadeIn();
+					function dependent_check(){
+						jQuery('.mgs-admin-row-dependent').each(function(){
+							if( jQuery(this).data('dependent')!='' ){
+								var dependent = jQuery(this).data('dependent');
+								jQuery('#'+dependent).addClass('mgs-admin-dependent-tigger');
+								if( !jQuery('#'+dependent).is(':checked') ){
+									jQuery(this).fadeOut('fast');
+								}else{
+									jQuery(this).fadeIn();
+								}
 							}
-						}
-					});
-				}
-				function setCookie(name,value,days) {
-					var expires = "";
-					if (days) {
-						var date = new Date();
-						date.setTime(date.getTime() + (days*24*60*60*1000));
-						expires = "; expires=" + date.toUTCString();
+						});
 					}
-					document.cookie = name + "=" + (value || "")  + expires + "; path=/";
-				}
-				function getCookie(name) {
-					var nameEQ = name + "=";
-					var ca = document.cookie.split(';');
-					for(var i=0;i < ca.length;i++) {
-						var c = ca[i];
-						while (c.charAt(0)==' ') c = c.substring(1,c.length);
-						if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-					}
-					return null;
-				}
-			</script>
+				</script>
 			<?php
 		}
-        
+
+		private function build_head(){
+			?>
+			<header class="mgs-admin-header">
+					<div class="inner-head content-style border-top-left-radius border-top-right-radius border-bottom margin-top" style="padding-bottom:0;">
+						<div class="brand">
+							<span class="logo"></span>
+							<span class="text">MGS Theme Upgrade</span>
+						</div>
+						<div class="addons-top">
+							<ul>
+							<?php echo $this->build_top_menu();?>
+							</ul>
+						</div>
+						<div class="theme">
+							<div class="switch-theme">
+								<input type="checkbox" id="switch-theme" name="switch-theme"/><label for="switch-theme">Toggle</label>
+							</div>
+						</div>
+					</div>
+				</header>
+				<header class="mgs-admin-header">
+					<div class="inner-head content-style border-bottom-left-radius border-bottom-right-radius margin-bottom">
+						<div class="version">
+							<span class="actual">
+								<span>V <?php echo $this->plg_ver?></span>
+							</span>
+							<span class="update">
+								<a href="#" class="mgs-admin-btn">Actualizar</a>
+							</span>
+						</div>
+						<div class="menu">
+							<ul class="menu-left">
+								<?php echo $this->build_menu()?>
+							</ul>
+						</div>
+					</div>
+				</header>
+			<?php
+		}
+		
+		private function build_top_menu(){
+			$screen = get_current_screen();
+			$out = '';
+			foreach( $this->settings['addons']['fields'] as $id_seccion=>$attrs ){
+				if( $attrs['show_on_top'] && $this->get_field_value($id_seccion) ){
+					$active = '';
+					if( in_array($screen->base, $this->$hook_styles) && $screen->base!='toplevel_page_'.$this->admin_option['menu_slug'] ){
+						$active = 'active';
+					}
+					$out .= '
+						<li class="'.$active.'">
+							<a href="#" title="addon">'.$attrs['label'].'</a>
+					';
+					if( $attrs['subs-menus'] ){
+						$out .= '<ul>';
+						foreach( $attrs['subs-menus'] as $sub_menu ){
+							$out .= '
+								<li>
+									<a href="admin.php?page='.$sub_menu['slug'].'">
+							';
+							if( $sub_menu['ico']) $out .= $sub_menu['ico'];
+							$out .= '
+										<div class="text">
+											<div class="label">'.$sub_menu['label'].'</div>
+							';
+							if( $sub_menu['desc'] ) $out .= '<div class="desc">'.$sub_menu['desc'].'</div>';
+							$out .= '
+										</div>
+									</a>
+								</li>
+							';
+						}
+						$out .= '</ul>';
+					}
+					$out .= '</li>';
+				}
+			}
+
+			return $out;
+		}
+
         private function build_menu(){
 			$out = '';
 			foreach( $this->settings as $id_seccion=>$attrs ){
@@ -258,9 +327,11 @@ if( !class_exists('MGS_Admin_Class') ){
 				}
 				$out .= '
 					<li class="item" data-tab="'.$id_seccion.'" id="tab-item-'.$id_seccion.'">
-						<span class="ico"><i class="'.$attrs['icon'].'"></i></span>
-						<span class="text">'.$attrs['label'].'</span>
-						'.$aviso.'
+						<a class="a" href="admin.php?page='.$this->admin_option['menu_slug'].'#/'.$id_seccion.'">
+							<span class="ico"><i class="'.$attrs['icon'].'"></i></span>
+							<span class="text">'.$attrs['label'].'</span>
+							'.$aviso.'
+						</a>
 					</li>
 				';
 			}
@@ -459,31 +530,56 @@ if( !class_exists('MGS_Admin_Class') ){
 		}
 		
 		public function admin_menu(){
-			add_options_page(
+			add_menu_page(
 				$this->admin_option['page_title'],
 				$this->admin_option['menu_title'],
 				$this->admin_option['capability'],
 				$this->admin_option['menu_slug'],
 				[$this, 'page']
 			);
+			$this->$hook_styles[] = 'toplevel_page_'.$this->admin_option['menu_slug'];
+			$added_subs = false;
+			foreach( $this->settings['addons']['fields'] as $id_seccion=>$attrs ){
+				if( $attrs['show_on_top'] && $this->get_field_value($id_seccion) && $attrs['subs-menus'] ){
+					foreach( $attrs['subs-menus'] as $sub_menu ){
+						$this->$hook_styles[] = 'mgs-theme-upgrade_page_'.$sub_menu['slug'];
+						if( $sub_menu['menu_side'] ){
+							add_submenu_page(
+								$this->admin_option['menu_slug'],
+								$sub_menu['label'],
+								$sub_menu['label'],
+								$this->admin_option['capability'],
+								$sub_menu['slug'],
+								$sub_menu['callback']
+							);
+							$added_subs = false;
+						}
+					}
+				}
+			}
+
+			
 		}
 
 		public function enqueue_scripts($hook){
-			if( $hook=='settings_page_'.$this->slug ){
+			if( in_array($hook, $this->$hook_styles) ){
 				wp_enqueue_script('jquery');
 				
 				wp_enqueue_script('semantic-ui-js', $this->plg_url.'assets/js/semantic.min.js', ['jquery']);
 				wp_enqueue_script('jquery-address-js', $this->plg_url.'assets/js/jquery.address.js', ['semantic-ui-js']);
 				wp_enqueue_script('jquery-validate-js', $this->plg_url.'assets/js/jquery.validate.min.js', ['jquery']);
 
-				wp_register_script('mgs-admin-js', $this->plg_url.'assets/js/admin.js', ['jquery']);
-   				wp_localize_script('mgs-admin-js', 'mgs_ajax',['ajaxurl'=>admin_url('admin-ajax.php')]);        
-   				wp_enqueue_script('mgs-admin-js');
+				
 
 
                 wp_enqueue_style('semantic-ui-css', $this->plg_url.'assets/css/semantic.min.css');
                 wp_enqueue_style('mgs-admin-css', $this->plg_url.'assets/css/admin2.css');
 			}
+
+			wp_register_script('mgs-admin-js', $this->plg_url.'assets/js/admin.js', ['jquery']);
+			wp_localize_script('mgs-admin-js', 'mgs_ajax',['ajaxurl'=>admin_url('admin-ajax.php')]);        
+			wp_enqueue_script('mgs-admin-js');
+
 			wp_enqueue_script('kit-fontawesome', 'https://kit.fontawesome.com/432b91a985.js');
 			wp_enqueue_style('mgs-all-admin-css', $this->plg_url.'assets/css/admin.css');
 		}
@@ -518,7 +614,7 @@ if( !class_exists('MGS_Admin_Class') ){
         }
 		
 		public function register_settings(){
-			$this->$raw_settings = [];
+			$this->raw_settings = [];
             foreach( $this->settings as $seccion ){
                 foreach( $seccion['fields'] as $id=>$attrs ){
                     if( self::$compatibility['wpml'] && $attrs['wpml'] ){
@@ -526,13 +622,13 @@ if( !class_exists('MGS_Admin_Class') ){
                         foreach( $languages as $lang_id=>$v ){
 							$option_name = $this->plg_name . '_' . $id . '_' . $lang_id;
 							add_option($option_name, $attrs['def']);
-							$this->$raw_settings[$option_name] = $attrs['def'];
+							$this->raw_settings[$option_name] = $attrs['def'];
                             register_setting($this->plg_name.'_options', $option_name, $this->plg_name.'_options_callback');
                         }
                     }else{
 						$option_name = $this->plg_name . '_' . $id;
 						add_option($option_name, $attrs['def']);
-						$this->$raw_settings[$option_name] = $attrs['def'];
+						$this->raw_settings[$option_name] = $attrs['def'];
 						register_setting($this->plg_name.'_options', $option_name, $this->plg_name.'_options_callback');
                     }
                 }

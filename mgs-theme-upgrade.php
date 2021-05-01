@@ -199,10 +199,31 @@ $config = [
 				'label'             => __('MGS Forms', 'mgs-theme-upgrade'),
 				'desc'              => __('Crea formularios.', 'mgs-theme-upgrade'),
 				'def'               => '',
+				'compatibility'		=> ['avada', 'elementor', 'gutenberg'],
+				'show_on_top'		=> true,
+				'subs-menus'		=> [
+					[
+						'ico'			=> '<i class="far fa-file-alt"></i>',
+						'label'			=> __('Formularios', 'mgs-theme-upgrade'),
+						'desc'			=> __('Listado de todos los formularios.', 'mgs-theme-upgrade'),
+						'menu_side'		=> true,
+						'slug'			=> 'mgs_forms',
+						'callback'		=> ['MGS_Forms', 'admin_forms']
+					],
+					[
+						'ico'			=> '<i class="far fa-plus-square"></i>',
+						'label'			=> __('Nuevo', 'mgs-theme-upgrade'),
+						'desc'			=> __('Crear un nuevo formulario.', 'mgs-theme-upgrade'),
+						'slug'			=> 'mgs_forms_new'
+					],
+				]
 			],
 		]
 	]
 ];
+
+//include helper functions
+require_once('includes/functions.php');
 
 global $mgs;
 require_once('class/class-main.php');
@@ -210,9 +231,10 @@ $mgs = new MGS_Theme_Upgrade($config);
 
 
 if( is_admin() ){
+	global $mgs_admin;
     require_once('class/class-mgs-admin.php');
 	require_once('class/class-admin.php');
-	new MGS_Theme_Upgrade_Admin($config);
+	$mgs_admin = new MGS_Theme_Upgrade_Admin($config);
 }
 
 if( $mgs->get_field_value('addon-lightbox') ){

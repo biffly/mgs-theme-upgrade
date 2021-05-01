@@ -4,6 +4,7 @@ if( !class_exists('MGS_Forms_Public') ){
         private static $flag_post;
         private static $string_required;
 
+        public static $countrys;
         public static $plg_url;
         public $config_form;
 
@@ -18,6 +19,8 @@ if( !class_exists('MGS_Forms_Public') ){
 
             self::$flag_post = false;
             self::$string_required = ' <span class="required">*</span>';
+
+            self::$countrys = $this->GetCountrysList();
         }
 
 
@@ -30,20 +33,25 @@ if( !class_exists('MGS_Forms_Public') ){
                 $uniqid = uniqid();
                 $unique_class = 'mgs-forms-'.$uniqid;
                 $out = '';
-                $out .= '<pre>'.print_r($form_data, true).'</pre>';
                 $out .= '
                     <div id="mgs-forms-'.$attrs['id'].'" class="mgs-forms '.$unique_class.'">
-                        <div class="mgs-forms-wrapper">
-                            <form id="mgs-form-'.$attrs['id'].'" method="post" enctype="multipart/form-data">
-                                '.$this->forms_items($form_data).'
-                            </form>
+                        <div class="mgs-forms-wrapper mgs-bootstrap">
+                            <div class="container">
+                                <form id="mgs-form-'.$attrs['id'].'" method="post" enctype="multipart/form-data">
+                                    <div class="row">
+                                        '.$this->forms_items($form_data).'
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 ';
 
-                wp_enqueue_style('mgs-forms-css');
-                wp_enqueue_style('mgs-forms-fa');
+                wp_enqueue_script('mgs-feather-js');
+
                 wp_enqueue_style('mgs-forms-bootstrap');
+                wp_enqueue_style('mgs-forms-css');
+                
 
                 wp_localize_script('mgs-forms-js', 'mgs_form_js', [
                         'ajaxurl'			=> admin_url('admin-ajax.php'),
@@ -54,6 +62,12 @@ if( !class_exists('MGS_Forms_Public') ){
                 );
                 wp_enqueue_script('mgs-forms-js', ['jquery', 'mgs-validate-js']);
 
+                if( is_array($this->$config_form['datepicker']) && count($this->$config_form['datepicker'])>0 ){
+                    wp_enqueue_script('mgs-datepicker-js');
+                    wp_enqueue_style('mgs-datepicker-css');
+                }
+
+                $out .= '<pre>'.print_r($form_data, true).'</pre>';
                 return $out;
             }else{
                 return 'Formulario no encontrado';
@@ -84,7 +98,9 @@ if( !class_exists('MGS_Forms_Public') ){
                     case 'number':
                         $out .= $this->_number($item);
                         break;
-
+                    case 'politicas':
+                        $out .= $this->_politicas($item);
+                        break;
 
 
                     case 'button':
@@ -96,8 +112,30 @@ if( !class_exists('MGS_Forms_Public') ){
             return $out;
         }
 
-        private function _number($item){
+        private function _politicas($item){
+            $required = ( $item->required ) ? 'required' : '';
             $out = $this->_label($item);
+            $text = $item->PoliticasText;
+            $textLink = $item->PoliticasLinkText;
+            $page = get_privacy_policy_url();
+            $link = '<a href="'.$page.'" title="'.$textLink.'">'.$textLink.'</a>';
+
+            $text = str_replace('{{link_politicas}}', $link, $text);
+            $out .= '
+                <div class="mgs-checks-grp">
+                    <div class=" form-check">
+                        <input class="form-check-input" type="checkbox" name="'.$item->name.'" id="'.$item->name.'" value="'.$item->value.'" '.$required.'>
+                        <label class="form-check-label" for="'.$item->name.'">'.$text.'</label>
+                    </div>
+                </div>
+            ';
+            return $out;
+        }
+
+        private function _number($item){
+            $out = '';
+            if( !$item->FloatLabel) $out .= $this->_label($item);
+
             $out .= '<input type="number" class="'.$item->className.'" name="'.$item->name.'" id="mgs_forms_item-'.$item->name.'" placeholder="'.$item->placeholder.'" value="'. $item->value.'" data-placement="bottom"';
 			if( $item->required ) $out .= ' required="required"';
 			if( $item->readonly ) $out .= ' readonly';
@@ -105,6 +143,9 @@ if( !class_exists('MGS_Forms_Public') ){
             if( $item->max ) $out .= ' max="'.$item->max.'"';
             if( $item->step ) $out .= ' step="'.$item->step.'"';
             $out .= '/>';
+
+            if( $item->FloatLabel) $out .= $this->_label($item);
+
             $out .= ( $item->description ) ? '<p class="help">'.$item->description.'</p>' : '';
             return $out;
         }
@@ -112,87 +153,120 @@ if( !class_exists('MGS_Forms_Public') ){
         private function _radio_group($item){
             $out = $this->_label($item);
             $required = ( $item->required ) ? 'required' : '';
-            $inline = ($item->inline ) ? 'inline' : '';
-            $fontawesome = ( $item->FontAwesomeReplace ) ? 'FontAwesomeReplace' : '';
-            $out .= '<fieldset class="'.$item->className.'mgs-radio-group '.$required.'">';
+            $inline = ($item->inline ) ? 'form-check-inline' : '';
+
+            $out .= '<div class="mgs-checks-grp">';
             foreach( $item->values as $k=>$check ){
                 $selected = ( $check->selected ) ? 'checked' : '';
                 $out .= '
-                    <div class="radio '.$inline.' '.$fontawesome.'">
-                        <input type="radio" name="'.$item->name.'[]" id="'.$item->name.'-'.$k.'" value="'.$check->value.'" '.$selected.'>
-                        <label for="'.$item->name.'-'.$k.'">'.$check->label.'</label>
+                    <div class=" form-check '.$inline.'">
+                        <input class="form-check-input" type="radio" name="'.$item->name.'" id="'.$item->name.'-'.$k.'" value="'.$check->value.'" '.$selected.'>
+                        <label class="form-check-label" for="'.$item->name.'-'.$k.'">'.$check->label.'</label>
                     </div>
                 ';
             }
-            $out .= '</fieldset>';
-            $out .= ( $item->description ) ? '<p class="help">'.$item->description.'</p>' : '';
+            $out .= '</div>';
             return $out;
         }
 
         private function _checkbox_group($item){
             $out = $this->_label($item);
             $required = ( $item->required ) ? 'required' : '';
-            $inline = ($item->inline ) ? 'inline' : '';
-            $fontawesome = ( $item->FontAwesomeReplace ) ? 'FontAwesomeReplace' : '';
-            $out .= '<fieldset class="'.$item->className.'mgs-check-group '.$required.'">';
+            $inline = ($item->inline ) ? 'form-check-inline' : '';
+            $switch = ($item->SwitchesStyle ) ? 'form-switch' : '';
+
+
+            $out .= '<div class="mgs-checks-grp">';
             foreach( $item->values as $k=>$check ){
                 $selected = ( $check->selected ) ? 'checked' : '';
                 $out .= '
-                    <div class="checkbox '.$inline.' '.$fontawesome.'">
-                        <input type="checkbox" name="'.$item->name.'[]" id="'.$item->name.'-'.$k.'" value="'.$check->value.'" '.$selected.'>
-                        <label for="'.$item->name.'-'.$k.'">'.$check->label.'</label>
+                    <div class=" form-check '.$inline.' '.$switch.'">
+                        <input class="form-check-input" type="checkbox" name="'.$item->name.'[]" id="'.$item->name.'-'.$k.'" value="'.$check->value.'" '.$selected.'>
+                        <label class="form-check-label" for="'.$item->name.'-'.$k.'">'.$check->label.'</label>
                     </div>
                 ';
             }
-            $out .= '</fieldset>';
-            $out .= ( $item->description ) ? '<p class="help">'.$item->description.'</p>' : '';
+            $out .= '</div>';
             return $out;
         }
 
         private function _select($item){
-            $out = $this->_label($item);
+            $out = '';
+            if( !$item->FloatLabel) $out .= $this->_label($item);
+
             $out .= '<select class="'.$item->className.'" name="'.$item->name.'" id="mgs_forms_item-'.$item->name.'"';
 			if( $item->required ) $out .= ' required="required"';
 			if( $item->readonly ) $out .= ' readonly';
             $out .= '>';
             $s = '';
-            foreach( $item->values as $option ){
-                $s = ( $option->selected ) ? 'selected' : '';
-                $out .= '<option value="'.$option->value.'" '.$s.'>'.$option->label.'</option>';
+            if( $item->SelectFild=='' ){
+                foreach( $item->values as $option ){
+                    $s = ( $option->selected ) ? 'selected' : '';
+                    $out .= '<option value="'.$option->value.'" '.$s.'>'.$option->label.'</option>';
+                }
+            }else{
+                $data = $this->GetSelectData($item);
+                foreach( $data as $k=>$v ){
+                    $s = ( $item->value==$k ) ? 'selected' : '';
+                    $out .= '<option value="'.$k.'" '.$s.'>'.$v.'</option>';
+                }
             }
             $out .= '</select>';
+            $out .= '<i data-feather="chevron-down" class="ico-js ico-select-js" stroke-width="1"></i>';
+
+            if( $item->FloatLabel) $out .= $this->_label($item);
+
             $out .= ( $item->description ) ? '<p class="help">'.$item->description.'</p>' : '';
             return $out;
         }
 
         private function _textarea($item){
-            $out = $this->_label($item);
+            $out = '';
+            if( !$item->FloatLabel) $out .= $this->_label($item);
+
             $out .= '<textarea class="'.$item->className.'" name="'.$item->name.'" id="mgs_forms_item-'.$item->name.'" placeholder="'.$item->placeholder.'" rows="'.$item->rows.'"';
 			if( $item->required ) $out .= ' required="required"';
 			if( $item->readonly ) $out .= ' readonly';
             $out .= '>'.$item->value.'</textarea>';
+
+            if( $item->FloatLabel) $out .= $this->_label($item);
+
             $out .= ( $item->description ) ? '<p class="help">'.$item->description.'</p>' : '';
 			return $out;
         }
 
         private function _text($item){
-            $out = $this->_label($item);
-            $out .= '<input type="'.$item->subtype.'" class="'.$item->className.'" name="'.$item->name.'" id="mgs_forms_item-'.$item->name.'" placeholder="'.$item->placeholder.'" value="'. $item->value.'" data-placement="bottom"';
+            $out = '';
+            if( !$item->FloatLabel) $out .= $this->_label($item);
+
+            $data_attr = '';
+            if( $item->data_attr ){
+                foreach( $item->data_attr as $k=>$v ){
+                    $data_attr .= 'data-'.$k.'="'.$v.'" ';
+                }
+            }
+
+            $out .= '<input '.$data_attr.' type="'.$item->subtype.'" class="'.$item->className.'" name="'.$item->name.'" id="mgs_forms_item-'.$item->name.'" placeholder="'.$item->placeholder.'" value="'. $item->value.'" data-placement="bottom"';
 			if( $item->required ) $out .= ' required="required"';
 			if( $item->readonly ) $out .= ' readonly';
 			if( $item->maxlength ) $out .= ' maxlength="'.$item->maxlength.'"';
             $out .= '/>';
             
+            if( $item->ShowDateIcon ) $out .= '<i data-feather="calendar" class="ico-js ico-date-js" stroke-width="1"></i>';
+
+            if( $item->FloatLabel) $out .= $this->_label($item);
+
             $out .= ( $item->description ) ? '<p class="help">'.$item->description.'</p>' : '';
             
             return $out;
         }
 
         private function _label($item){
-            if( $item->ShowLabel ){
-                $out = '<label for="mgs_forms_item-'.$item->name.'" class="mgs-forms-label form-control-label">'.$item->label.'</label>';
-                return $out;
-            }
+            $c= 'mgs-forms-label form-label ';
+            if( !$item->ShowLabel && !$item->FloatLabel ) $c .= 'visually-hidden ';
+            if( $item->FloatLabel ) $c .= 'mgs-forms-label-floted ';
+            $out = '<label for="mgs_forms_item-'.$item->name.'" class="'.$c.'">'.$item->label.'</label>';
+            return $out;
         }
 
         private function _button($item){
@@ -207,8 +281,15 @@ if( !class_exists('MGS_Forms_Public') ){
                 if( $item->EnabledJquery ){
                     $item->type = 'text';
                     $item->subtype = 'text';
-                    $this->$config_form['datapicker'][] = [
-                        'id'    => $item->name,
+                    $item->data_attr = [
+                        'datepicker' => ''
+                    ];
+                    $item->ShowDateIcon = true;
+
+                    $this->$config_form['scripts']['mgs-datepicker-js'] = true;
+                    $this->$config_form['datepicker'][] = [
+                        'id'        => $item->name,
+                        'format'    => $item->FormatsDates
                     ];
                 }else{
                     $item->type = 'text';
@@ -226,14 +307,22 @@ if( !class_exists('MGS_Forms_Public') ){
                 $item->value = $item->value;
             }
             
+            //placeholder
+            if( $item->FloatLabel && $item->placeholder=='' ){
+                $item->placeholder = $item->label;
+            }
+
             //required
             if( $item->required ){
                 if( isset($item->label) ) $item->label .= self::$string_required;
             }
 
+            
+
             //class
             $class = [
                 'mgs-forms-control',
+                'forms-control',
                 $item->className
             ];
             $item->className = implode(' ', array_unique($class));
@@ -245,10 +334,13 @@ if( !class_exists('MGS_Forms_Public') ){
             $class = [
                 'mgs-forms-item',
                 'mgs-forms-item-'.$item->type,
-                $item->ColWidth
+                $item->ColWidth,
+                'mb-3'
             ];
+            if( $item->FloatLabel) $class[] = 'form-floating';
+
             $class = implode(' ', $class);
-            $out .= '<div class="'.$class.'">';
+            $out .= '<div id="mgs_forms_item_wrap-'.$item->name.'" class="'.$class.'">';
             return $out;
         }
 
@@ -256,14 +348,31 @@ if( !class_exists('MGS_Forms_Public') ){
             return '</div>';
         }
 
+        private function GetSelectData($item){
+            if( $item->SelectFild=='paises' ){
+                return self::$countrys;
+            }
+        }
+
+        private function GetCountrysList(){
+            $content = file_get_contents(self::$plg_url.'assets/json/countrys.json');
+            $content = (array) json_decode($content);
+            asort($content);
+            return $content;
+        }
+
         public function enqueue_scripts(){
             wp_register_script('mgs-validate-js', self::$plg_url.'assets/js/jquery.validate.min.js', ['jquery']);
+            wp_register_script('mgs-datepicker-js', self::$plg_url.'assets/js/datepicker/datepicker.js', ['jquery']);
             wp_register_script('mgs-forms-js', self::$plg_url.'assets/js/public.js', ['jquery', 'mgs-validate-js']);
+            wp_register_script('mgs-feather-js', 'https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js');
+            
             
             
 
-            wp_register_style('mgs-forms-bootstrap', 'https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css');
-            wp_register_style('mgs-forms-fa', 'https://use.fontawesome.com/releases/v5.15.1/css/all.css');
+            wp_register_style('mgs-forms-bootstrap', self::$plg_url.'assets/css/mgs-bootstrap.css');
+            wp_register_style('mgs-datepicker-css', self::$plg_url.'assets/js/datepicker/datepicker.css');
+
             wp_register_style('mgs-forms-css', self::$plg_url.'assets/css/public.css');
         }
     }
